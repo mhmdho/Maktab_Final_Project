@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% block header %}
+    Login
+{% endblock header %}
+
+{% block content %}
+
+
+<div class="container text-center my-5">
+    <div class="col-md-12 my-3">
+        <form action='{% url "login_url" %}' method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <!-- <input type="hidden" value="next"> -->
+            <input type="submit" value="Login">
+        </form>
+        <div class="my-5 pb-1">
+            <p class="pb-5">not registered yet? <a href='{% url "register_url" %}'> REGISTER NOW</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

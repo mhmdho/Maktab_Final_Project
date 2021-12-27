@@ -1,0 +1,64 @@
+{%extends  "base.html"%}
+
+{% block header %}
+    <strong class="text-uppercase">{{ user }}</strong> Dashboard
+{% endblock header %}
+
+
+{% block content %}
+
+
+<main class="my-5">
+  <div class="container">
+    <!--Section: Content-->
+    <section class="text-center mt-5">
+        <div class="row">
+            {% for post in user_posts %}
+                <div class="col-lg-3 col-md-12 mb-4">
+                    <div class="card">
+                        <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" class="img-fluid" />
+                            {% else %}
+                                <img src="https://mdbootstrap.com/img/new/standard/nature/00{{ post.id }}.jpg" class="img-fluid" />
+                            {% endif %}
+                            <a href="#!">
+                                <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                            </a>
+                            </div>
+                            <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">
+                                <br>
+                                {{ post.short_description }}
+
+                                <hr>
+                                Written by: {{ post.author }}
+                                <br>
+                                Created at: {{ post.created_at.date }}
+
+                            </p>
+
+                            <a href="{% url 'edit_post_url' slug=post.slug %}" class="btn btn-warning" style="width: 47%;">Edit</a>
+                            <a href="{% url 'delete_post_url' slug=post.slug %}" class="btn btn-danger px-0" style="width: 47%;">Delete</a>
+                            <hr>
+                            <br>
+
+                            <a href="{% url 'add_comment_url' slug=post.slug %}" class="btn btn-primary">Read</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p></p>
+                <p>welcome {{user}}, You have written no post.</p>
+                <a href="{% url 'add_post_url' %}">+ create new post</a>
+                <p class="my-5 pt-4"></p>
+
+            {% endfor %}
+
+        </div>
+    </section>
+  </div>
+</main>
+
+{% endblock content %}

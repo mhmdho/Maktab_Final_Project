@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block header %}
+    Edit Category
+{% endblock header %}
+
+{% block content %}
+
+
+<div class="container my-5 pb-4 text-center">
+    <div class="col-md-12 my-3">
+        <form action="{% url 'edit_category_url' id=category.id %}" method="post">
+            {% csrf_token %}
+            <label for="title" class="col-form-label">Title</label>
+            <div class="fieldWrapper">
+                {{form.title}}
+            </div>
+            <p class="fw-light fst-italic">rename ({{category.title}}) ?</p>
+            <input class="btn btn-danger mt-3" type="submit" value="edit">
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,61 @@
+{%extends  "base.html"%}
+
+{% block header %}
+    Posts of {{ category_posts.title }} category
+{% endblock header %}
+
+
+{% block content %}
+
+
+<main class="my-5">
+  <div class="container">
+    <!--Section: Content-->
+    <section class="text-center mt-5">
+        <div class="row">
+            {% for post in category_posts %}
+                <div class="col-lg-3 col-md-12 mb-4">
+                    <div class="card">
+                        <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" class="img-fluid" />
+                            {% else %}
+                                <img src="https://mdbootstrap.com/img/new/standard/nature/00{{ post.id }}.jpg" class="img-fluid" />
+                            {% endif %}                            
+                            <a href="#!">
+                                <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                            </a>
+                            </div>
+                            <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">
+                                <br>
+                                {{ post.short_description }}
+
+                                <hr>
+                                Written by: {{ post.author }}
+                                <br>
+                                Created at: {{ post.created_at.date }}
+
+                                
+                            </p>
+                            {% if user %}
+                                <a href="{% url 'add_comment_url' slug=post.slug %}" class="btn btn-primary">Read</a>
+                            {% else %}
+                                <a href="{% url 'post_detail' slug=post.slug %}" class="btn btn-primary">Read</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p></p>
+                <p class="my-5 pb-5">There is no post.</p>
+                <p class="my-3"></p>
+            {% endfor %}
+
+        </div>
+    </section>
+  </div>
+</main>
+
+{% endblock content %}
