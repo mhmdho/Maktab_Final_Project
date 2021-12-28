@@ -1,5 +1,5 @@
 from django import forms
-from .models import  Comment, Tag,Category,Post
+from .models import  Comment, Tag, Category, Post
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
