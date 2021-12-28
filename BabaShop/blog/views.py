@@ -202,7 +202,7 @@ def edit_tag(request,id):
 
 @login_required(login_url='login_url')
 def each_user_posts(request):
-    user_posts = Post.objects.filter(author__id=request.user.id)
+    user_posts = Post.objects.filter(supplier__id=request.user.id)
     return render(request, 'post/user_posts.html', {'user_posts': user_posts, 'user': request.user.username})
 
 
@@ -211,7 +211,7 @@ def add_post(request):
     form = AddPostForm(request.POST, request.FILES)
     if form.is_valid():
         obj = form.save(commit=False)
-        obj.author = request.user
+        obj.supplier = request.user
         form.save()
         return redirect(reverse('user_posts_url'))
 
@@ -222,7 +222,7 @@ def add_post(request):
 def delete_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
     form = PostDeleteForm()
-    if request.method == "POST" and request.user.id == post.author.id:
+    if request.method == "POST" and request.user.id == post.supplier.id:
         post.delete()
         return redirect(reverse('user_posts_url'))
 
@@ -233,7 +233,7 @@ def delete_post(request, slug):
 def edit_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
     form = EditPostForm(instance=post)
-    if request.method == "POST" and request.user.id == post.author.id:
+    if request.method == "POST" and request.user.id == post.supplier.id:
         form = EditPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
@@ -252,7 +252,7 @@ def add_comment(request, slug):
         form = AddCommentForm(request.POST, initial={})
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.owner = request.user
+            obj.customer = request.user
             obj.post = post
             form.save()
             return redirect(f'../add_comment/{slug}')

@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
 from .managers import UndeletedShop, DeletedShop
-from user.models import CustomUser
+from myuser.models import CustomUser
 
 # Create your models here.
 
@@ -24,7 +24,7 @@ class Shop(models.Model):
         (CON, "Convenience store"),
     )
     name = CharField(max_length=50)
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES, default=SUP)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
     supplier = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     is_confirmed = BooleanField(default=False)
@@ -47,7 +47,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField(max_length=400)
     category = models.ForeignKey('Category', on_delete=models.CASCADE) 
-    tag = models.ManyToManyField('Tag', null=True, blank=True)
+    tag = models.ManyToManyField('Tag', blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
     # image = models.ImageField(upload_to='product_image/')
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)

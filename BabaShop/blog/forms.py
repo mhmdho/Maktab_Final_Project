@@ -79,7 +79,7 @@ class EditTagForm(forms.ModelForm):
 class AddPostForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ['slug', 'like', 'author']
+        exclude = ['slug', 'like', 'supplier']
 
 
 class PostDeleteForm(forms.ModelForm):
@@ -91,7 +91,7 @@ class PostDeleteForm(forms.ModelForm):
 class EditPostForm(forms.ModelForm):
     class Meta : 
         model = Post
-        exclude = ['slug', 'like', 'author']
+        exclude = ['slug', 'like', 'supplier']
 
 
 class AddCommentForm(forms.ModelForm):
@@ -101,7 +101,7 @@ class AddCommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        exclude = ['like', 'post', 'owner']
+        exclude = ['like', 'post', 'customer']
 
 
 class ContactForm(forms.Form):

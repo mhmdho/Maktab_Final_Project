@@ -31,7 +31,7 @@
                     <br>
                     <hr>
                     <p class="my-0 text-lg-start">
-                      Written by: {{ post.author }}
+                      Written by: {{ post.supplier }}
                       <br>
                       Created at: {{ post.created_at.date }}
                     <p>
@@ -46,7 +46,7 @@
                     {% for comment in comment_list %}
                         <li class="list-group-item">
                             {{ comment.title }}
-                            <h6>{{ comment.owner }} :  {{ comment.description }}</h6>
+                            <h6>{{ comment.customer }} :  {{ comment.description }}</h6>
                             <p class="my-0 text-lg-end">{{ comment.created_at }} ---  (likes: {{ comment.like }})</p>
                         </li>
                     {% empty %}

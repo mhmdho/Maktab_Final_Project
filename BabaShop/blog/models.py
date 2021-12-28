@@ -1,5 +1,5 @@
 from django.db import models
-from user.models import CustomUser
+from myuser.models import CustomUser
 from django.template.defaultfilters import slugify
 import random
 
@@ -19,12 +19,12 @@ class UnpublishedPost(models.Manager):
 class Post(models.Model):
     slug = models.SlugField(max_length=100, blank=True, unique=True)
     title = models.CharField('title post' ,max_length=150)
-    author = models.ForeignKey(CustomUser,on_delete=models.CASCADE,verbose_name='post author')
+    supplier = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='post author')
     short_description = models.CharField('short description',max_length=255,null=True,blank=True)
     descrption = models.TextField()
     image = models.ImageField(upload_to='image/')
     category = models.ManyToManyField('Category') 
-    tag = models.ManyToManyField('Tag',null=True,blank=True)
+    tag = models.ManyToManyField('Tag', blank=True)
     like = models.IntegerField(default=0, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,14 +53,14 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_comment")    
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='comment_owner')
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='comment_owner')
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=400)   
     like = models.IntegerField(default=0, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.owner} commented on {self.post}"
+        return f"{self.customer} commented on {self.post}"
 
 
 class Category(models.Model):

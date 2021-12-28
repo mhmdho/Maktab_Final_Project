@@ -1,7 +1,7 @@
 from django.db import models
 from shop.models import Product
 from django.core.validators import MinValueValidator
-from user.models import CustomUser
+from myuser.models import CustomUser
 
 # Create your models here.
 
@@ -21,7 +21,7 @@ class Order(models.Model):
     total_quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=CH)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=CH)
     is_payment = models.BooleanField(default=False)
 
     def __str__(self):
