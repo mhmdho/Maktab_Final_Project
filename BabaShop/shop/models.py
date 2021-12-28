@@ -1,19 +1,18 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
-from django.db.models.fields.related import ForeignKey
 from managers import UndeletedShop, DeletedShop
 
 # Create your models here.
 
 
-class Shop:
-    SUP = "Supermarket"
-    HYP = "Hypermarket"
-    GRE = "Greengrocer"
-    FRU = "fruit store"
-    ORG = "Organic store"
-    CON = "Convenience store"
+class Shop(models.Model):
+    SUP = "SUPERMARKET"
+    HYP = "HYPERMARKET"
+    GRE = "GREENGROCER"
+    FRU = "FRUIT STORE"
+    ORG = "ORGANIC STORE"
+    CON = "CONVENIENCE STORE"
 
     TYPE_CHOICES = (
         (SUP, "Supermarket"),
@@ -24,7 +23,7 @@ class Shop:
         (CON, "Convenience store"),
     )
     name = CharField(max_length=50)
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES, default="SUP")
+    type = models.CharField(max_length=3, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
     supplier = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     is_confirmed = BooleanField(default=False)
@@ -50,7 +49,7 @@ class Product(models.Model):
     tag = models.ManyToManyField('Tag', null=True, blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
     # image = models.ImageField(upload_to='product_image/')
-    shop = ForeignKey('Shop', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
 
@@ -65,7 +64,7 @@ class Product(models.Model):
         return self.name
 
 
-class Image:
+class Image(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name="product_img")
     image = models.ImageField(upload_to='product_image/')
 
