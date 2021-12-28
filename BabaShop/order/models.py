@@ -16,7 +16,7 @@ class Order(models.Model):
         (CF, "Confirmed"),
         (CA, "Canceled"),
     )
-    customer = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
     total_quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)

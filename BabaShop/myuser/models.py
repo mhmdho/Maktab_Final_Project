@@ -9,7 +9,7 @@ from .managers import CustomUserManager
 class CustomUser(AbstractUser):
 
     email = models.EmailField(_('email address'), unique=True)
-    phone = models.CharField(_('email address'), max_length=13, unique=True)
+    phone = models.CharField(_('phone address'), max_length=13, unique=True)
     image = models.ImageField(upload_to='user_image/', null=True, blank=True)
     last_login = models.DateTimeField(auto_now=True)
 
