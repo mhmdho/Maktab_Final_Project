@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from user.models import CustomUser
 from django.template.defaultfilters import slugify
 import random
 
@@ -19,7 +19,7 @@ class UnpublishedPost(models.Manager):
 class Post(models.Model):
     slug = models.SlugField(max_length=100, blank=True, unique=True)
     title = models.CharField('title post' ,max_length=150)
-    author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name='post author')
+    author = models.ForeignKey(CustomUser,on_delete=models.CASCADE,verbose_name='post author')
     short_description = models.CharField('short description',max_length=255,null=True,blank=True)
     descrption = models.TextField()
     image = models.ImageField(upload_to='image/')
@@ -52,8 +52,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post,on_delete=models.CASCADE, related_name="post_comment")    
-    owner = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name='comment_owner')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_comment")    
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='comment_owner')
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=400)   
     like = models.IntegerField(default=0, null=True, blank=True)
@@ -64,14 +64,14 @@ class Comment(models.Model):
 
 
 class Category(models.Model):
-    title = models.CharField('title category' ,max_length=255)
+    title = models.CharField('title category', max_length=255)
 
     def __str__(self):
         return self.title
 
 
 class Tag(models.Model):
-    title = models.CharField('The_title' ,max_length=255)
+    title = models.CharField('The_title', max_length=255)
 
     class Meta : 
         verbose_name_plural = "post_tags"

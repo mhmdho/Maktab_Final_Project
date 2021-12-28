@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'BabaShop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('django.db.backends.postgresql_psycopg2'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': env('NAME'), 
         'USER': env('USER'), 
         'PASSWORD': env('PASSWORD'),

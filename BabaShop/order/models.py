@@ -1,6 +1,7 @@
 from django.db import models
-from BabaShop.shop.models import Product
+from shop.models import Product
 from django.core.validators import MinValueValidator
+from user.models import CustomUser
 
 # Create your models here.
 
@@ -15,7 +16,7 @@ class Order(models.Model):
         (CF, "Confirmed"),
         (CA, "Canceled"),
     )
-    customer = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    customer = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
     total_quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,7 +41,7 @@ class OrderItem(models.Model):
 
 class ProductComment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_comment")    
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     subject = models.CharField(max_length=50)
     description = models.TextField(max_length=200)   
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,7 +52,7 @@ class ProductComment(models.Model):
 
 class ProductLike(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_like")    
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('product', 'customer',)

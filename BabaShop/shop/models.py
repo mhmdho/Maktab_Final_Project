@@ -1,7 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
-from managers import UndeletedShop, DeletedShop
+from .managers import UndeletedShop, DeletedShop
+from user.models import CustomUser
 
 # Create your models here.
 
@@ -25,7 +26,7 @@ class Shop(models.Model):
     name = CharField(max_length=50)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
-    supplier = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    supplier = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     is_confirmed = BooleanField(default=False)
     is_deleted = BooleanField(default=False)
 
