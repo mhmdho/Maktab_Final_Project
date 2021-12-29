@@ -12,12 +12,23 @@
     <div class="col-md-12 my-3">
         <form action='{% url "login_url" %}' method="post">
             {% csrf_token %}
-            {{form.as_p}}
+
+            {% for field in form %}
+            <label for="title" class="col-form-label">{{ field.label_tag }}</label>
+            <div class="fieldWrapper mb-4">
+                <!-- {{ field.errors }} -->
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
             <!-- <input type="hidden" value="next"> -->
             <input type="submit" value="Login">
         </form>
-        <div class="my-5 pb-1">
-            <p class="pb-5">not registered yet? <a href='{% url "register_url" %}'> REGISTER NOW</a></p>
+        <div class="mt-5 pb-1">
+            <p>Not registered yet? <a href='{% url "register_url" %}'> REGISTER NOW</a></p>
         </div>
     </div>
 </div>

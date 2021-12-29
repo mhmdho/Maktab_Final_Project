@@ -38,7 +38,7 @@
       <div class="container-fluid">
         <!-- Navbar brand -->
         {% if request.user.id %}
-          <a class="navbar-brand" href="{% url 'user_posts_url' %}"> <strong class="text-uppercase">{{ request.user.username }}</strong> </a>
+          <a class="navbar-brand" href="{% url 'user_posts_url' %}"> <strong class="text-uppercase">{{ request.user.phone }}</strong> </a>
           <a class="navbar-brand" href="{% url 'change_password_url' %}"> password </a>
           <a class="navbar-brand" href="{% url 'logout_url' %}"> Logout </a>
         {% else %} 

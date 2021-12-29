@@ -1,7 +1,7 @@
 {%extends  "base.html"%}
 
 {% block header %}
-    <strong class="text-uppercase">{{ user }}</strong> Dashboard
+    <strong class="text-uppercase">{{ user.phone }}</strong> Dashboard
 {% endblock header %}
 
 
@@ -52,7 +52,7 @@
                 <p></p>
                 <p>welcome {{user}}, You have written no post.</p>
                 <a href="{% url 'add_post_url' %}">+ create new post</a>
-                <p class="my-5 pt-4"></p>
+                <p class="mt-5 pt-4"></p>
 
             {% endfor %}
 

@@ -2,7 +2,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from django.contrib.auth.models import User
+from myuser.models import CustomUser
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from blog.models import Post, Category, Comment, Tag
@@ -17,11 +17,11 @@ from django.core.mail import send_mail, BadHeaderError
 from django.db.models.query_utils import Q
 
 # Create your views here.
-
+User = CustomUser
 
 class MainPageView(ListView):
     model = Post
-    template_name = "post/index.html"
+    template_name = "blog/index.html"
     context_object_name = 'posts'
     queryset = Post.Published.all()
 
@@ -48,12 +48,12 @@ def show_category_list(request):
         form.save()
         return redirect(reverse('category-list'))
     category_list = Category.objects.all()
-    return render(request, 'post/category_list.html', {'categories': category_list, 'form_cat':form})
+    return render(request, 'blog/category_list.html', {'categories': category_list, 'form_cat':form})
 
 
 def each_category_posts(request, id):
     category_posts = Post.Published.filter(category__id = id)
-    return render(request, 'post/category_posts.html', {'category_posts': category_posts, 'user':request.user})
+    return render(request, 'blog/category_posts.html', {'category_posts': category_posts, 'user':request.user})
 
 
 def show_tag_list(request):
@@ -63,19 +63,19 @@ def show_tag_list(request):
         form.save()
         return redirect(reverse('tag-list'))
     tag_list = Tag.objects.all()
-    return render(request, 'post/tag_list.html', {'tags': tag_list, 'form_tag': form})
+    return render(request, 'blog/tag_list.html', {'tags': tag_list, 'form_tag': form})
 
 
 def each_tag_posts(request, id):
     tag_posts = Post.Published.filter(tag__id = id)
-    return render(request, 'post/tag_posts.html', {'tag_posts': tag_posts})
+    return render(request, 'blog/tag_posts.html', {'tag_posts': tag_posts})
 
 
 def login_site(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(request,username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            user = authenticate(request,phone=form.cleaned_data['phone'], password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
                 next = request.GET.get('next')
@@ -102,7 +102,7 @@ def Register_site(request):
     form = RegisterForm(None or request.POST)
     if request.method == "POST":
         if form.is_valid():
-            user = User.objects.create_user(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            user = User.objects.create_user(phone=form.cleaned_data['phone'], password=form.cleaned_data['password'])
             return redirect('login_url')
 
     return render(request, 'forms/register.html', {'form':form})
@@ -128,7 +128,7 @@ def search_site(request):
         search = request.GET.get('search_box')
         posts = Post.Published.filter(Q(title__icontains=search) |
                                     Q(descrption__icontains=search))
-    return render(request, 'post/search.html', {'posts': posts})
+    return render(request, 'blog/search.html', {'posts': posts})
 
 
 @login_required(login_url='login_url')
@@ -203,7 +203,7 @@ def edit_tag(request,id):
 @login_required(login_url='login_url')
 def each_user_posts(request):
     user_posts = Post.objects.filter(supplier__id=request.user.id)
-    return render(request, 'post/user_posts.html', {'user_posts': user_posts, 'user': request.user.username})
+    return render(request, 'blog/user_posts.html', {'user_posts': user_posts, 'user': request.user})
 
 
 @login_required(login_url='login_url')
@@ -298,4 +298,4 @@ def contact_site(request):
 			return redirect ("index")
       
 	form = ContactForm()
-	return render(request, "post/contact.html", {'form':form})
+	return render(request, "blog/contact.html", {'form':form})

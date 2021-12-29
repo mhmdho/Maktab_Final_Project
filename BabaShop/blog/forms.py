@@ -1,20 +1,19 @@
 from django import forms
 from .models import  Comment, Tag, Category, Post
-from django.contrib.auth.models import User
+from myuser.models import CustomUser
 from django.core.exceptions import ValidationError
 
 
 class LoginForm(forms.Form):
+    phone = forms.CharField(max_length=11)
     password = forms.CharField(widget=forms.PasswordInput)
-    class Meta:
-        model = User
-        fields = ['phone', 'password']
+
 
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['phone', 'email', 'password']
 
 
