@@ -62,7 +62,7 @@ class Product(models.Model):
         ordering = ['-id']
 
     def get_image(self):
-        return self.image_set.all()
+        return self.product_img.get(default=True).image.url
 
     def __str__(self):
         return self.name
@@ -73,9 +73,8 @@ class Image(models.Model):
     image = models.ImageField(upload_to='product_image/')
     default = models.BooleanField(default=False)
 
-
     def __str__(self):
-        return self.id
+        return self.image.url
 
 
 class ProductCategory(models.Model):
