@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block header %}
+  Search results
+{% endblock header %}
+
+{% block content %}
+
+
+<main class="my-5">
+    <div class="container">
+      <!--Section: Content-->
+      <section class="text-center">
+        <div class="row">
+          {% for post in posts %}
+            <div class="col-lg-3 col-md-12 mb-4">
+              <div class="card">
+                <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                  {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid" />
+                  {% else %}
+                    <img src="https://mdbootstrap.com/img/new/standard/nature/00{{ post.id }}.jpg" class="img-fluid" />
+                  {% endif %}
+                  <a href="#!">
+                    <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">{{ post.title }}</h5>
+                  <p class="card-text">
+                    {{ post.short_description }}
+                    
+                  </p>
+                  <a href="{% url 'add_comment_url' slug=post.slug %}" class="btn btn-primary">Read</a>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <p class="my-3 pb-5">There is no post.</p>
+            <p class="mb-2"></p>
+          {% endfor %}
+
+        </div>
+      </section>
+      <!--Section: Content-->
+
+      <!-- Pagination -->
+      <nav class="my-4" aria-label="...">
+        <ul class="pagination pagination-circle justify-content-center">
+          <li class="page-item">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item active" aria-current="page">
+            <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </main>
+
+{% endblock content %}

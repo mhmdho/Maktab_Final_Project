@@ -1,0 +1,77 @@
+{%extends  "base.html"%}
+
+{% block header %}
+  Contact Us
+{% endblock header %}
+
+
+{% block content %}
+
+
+
+<div class="content my-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mr-auto pt-5">
+                <h2>Share your view with us</h2>
+                    <p class="my-5 pe-2 me-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste quaerat autem corrupti asperiores accusantium et fuga! Facere excepturi, quo eos, nobis doloremque dolor labore expedita illum iusto, aut repellat fuga!</p>
+                <ul class="list-unstyled pl-md-5 pt-5">
+                    <li class="d-flex text-black mb-2">
+                    <span class="mr-3"><span class="icon-map"></span></span> 34 Street, Nofeloshatelo Ave., Tehran, <br> Tehran, Iran
+                    </li>
+                    <li class="d-flex text-black mb-2"><span class="mr-3"><span class="icon-phone"></span></span> +98 (021) 2245 6789</li>
+                    <li class="d-flex text-black"><span class="mr-3"><span class="icon-envelope-o"></span></span> info@myblog.com </li>
+                </ul>
+            </div>
+            <div class="col-md-5 m-auto">
+                <form class="mb-5" method="post" id="contactForm" name="contactForm" novalidate="novalidate">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12 form-group mt-4">
+                            <label for="name" class="col-form-label">Name</label>
+                            <div class="fieldWrapper">
+                                {{form.name}}
+                            </div>
+                            <!-- <input form="" type="text" class="form-control error" name="name" id="name" aria-required="true" placeholder="Please enter your name"><label id="name-error" class="error" for="name"></label> -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <label for="email" class="col-form-label">Email</label>
+                            <div class="fieldWrapper">
+                                {{ form.email_address }}
+                            </div>
+                            <!-- <input type="text" class="form-control error" name="email" id="email" aria-required="true" placeholder="Please enter a valid email address"><label id="email-error" class="error" for="email"></label> -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <label for="message" class="col-form-label">Message</label>
+                            <div class="fieldWrapper">
+                                {{ form.message }}
+                            </div>
+                            <!-- <textarea class="form-control error" name="message" id="message" cols="30" rows="7" aria-required="true" aria-invalid="true" placeholder="Please enter a message"></textarea><label id="message-error" class="error" for="message"></label> -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="submit" value="Send Message" class="btn btn-primary rounded-0 py-2 px-4">
+                            <span class="submitting"></span>
+                        </div>
+                    </div>
+                </form>
+                <div id="form-message-warning mt-4"></div>
+            </div>
+        </div>
+    </div>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popper.min.js+bootstrap.min.js.pagespeed.jc.IHkW1QTIuN.js"></script><script>eval(mod_pagespeed_J2E44BeRjI);</script>
+    <script>eval(mod_pagespeed_7GdsfrSu7q);</script>
+    <script src="js/jquery.validate.min.js+main.js.pagespeed.jc.ymlEcKnLFv.js"></script><script>eval(mod_pagespeed_BAOLwhxHbP);</script>
+    <script>eval(mod_pagespeed_JPTuk9T3aQ);</script>
+    <script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/v64f9daad31f64f81be21cbef6184a5e31634941392597" integrity="sha512-gV/bogrUTVP2N3IzTDKzgP0Js1gg4fbwtYB6ftgLbKQu/V8yH2+lrKCfKHelh4SO3DPzKj4/glTO+tNJGDnb0A==" data-cf-beacon="{&quot;rayId&quot;:&quot;6bafd5e2c08916ea&quot;,&quot;token&quot;:&quot;cd0b4b3a733644fc843ef0b185f98241&quot;,&quot;version&quot;:&quot;2021.11.0&quot;,&quot;si&quot;:100}" crossorigin="anonymous"></script>
+    <script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/v64f9daad31f64f81be21cbef6184a5e31634941392597" integrity="sha512-gV/bogrUTVP2N3IzTDKzgP0Js1gg4fbwtYB6ftgLbKQu/V8yH2+lrKCfKHelh4SO3DPzKj4/glTO+tNJGDnb0A==" data-cf-beacon="{&quot;rayId&quot;:&quot;6bafd5e2295016ea&quot;,&quot;token&quot;:&quot;cd0b4b3a733644fc843ef0b185f98241&quot;,&quot;version&quot;:&quot;2021.11.0&quot;,&quot;si&quot;:100}" crossorigin="anonymous"></script>
+
+</div>
+
+{% endblock content %}

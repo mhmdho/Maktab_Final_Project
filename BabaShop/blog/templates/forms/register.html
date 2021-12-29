@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block header %}
+    Register
+{% endblock header %}
+
+{% block content %}
+
+
+<div class="container my-5 text-center">
+    <div class="col-md-12 my-3">
+        <form action='{% url "register_url" %}' method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <label for="title" class="col-form-label">{{ field.label_tag }}</label>
+            <div class="fieldWrapper mb-4">
+                <!-- {{ field.errors }} -->
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <input type="submit" value="register">
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

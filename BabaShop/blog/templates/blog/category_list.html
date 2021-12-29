@@ -1,0 +1,61 @@
+{%extends  "base.html"%}
+
+{% block header %}
+    All Categories
+{% endblock header %}
+
+{% block content %}
+
+
+<div class="container mt-3 text-center" style="padding:30px">
+  <form action="{% url 'add_category_url' %}" method="post">
+          <div class="input-group">
+            {% csrf_token %}
+            {{ form_cat.title }}
+            <!-- <input type="text" class="form-control text-center" placeholder="Add your new category here" name="category_box"> -->
+            <button class="btn btn-primary" type="submit">Add</button>
+            <!-- <button class="btn btn-danger" type="button">X</button> -->
+          </div>
+  </form>
+</div>
+
+
+<main class="my-5">
+  <div class="container">
+    <!--Section: Content-->
+    <section class="text-center mt-5">
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-lg-3 col-md-12 mb-4">
+                <div class="card">
+                    <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                    <img src="https://mdbootstrap.com/img/new/standard/nature/00{{ category.id }}.jpg" class="img-fluid" style="border-radius: 50%;" />
+                    {{ category.id }}
+                    <a href="#!">
+                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                    </a>
+                    </div>
+                    <div class="card-body">
+                    <h5 class="card-title">{{ category.title }}</h5>
+                      
+                      <a href="{% url 'edit_category_url' id=category.id %}" class="btn btn-warning" style="width: 47%;">Edit</a>
+                      <a href="{% url 'delete_category_url' id=category.id %}" class="btn btn-danger px-0" style="width: 47%;">Delete</a>
+                      <hr>
+                      <br>
+
+                    <a href="{% url 'category_to_posts' id=category.id %}" class="btn btn-primary">Read Posts</a>
+                    </div>
+                </div>
+                </div>
+            {% empty %}
+              <p class="my-2 pb-1">There is no category.</p>
+              <p class="my-2"></p>
+            {% endfor %}
+
+        </div>
+    </section>
+  </div>
+</main>
+
+{% endblock content %}
+

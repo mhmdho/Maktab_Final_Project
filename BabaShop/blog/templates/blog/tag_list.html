@@ -1,0 +1,60 @@
+{%extends  "base.html"%}
+
+{% block header %}
+  Tags
+{% endblock header %}
+
+{% block content %}
+
+
+<div class="container mt-3 text-center" style="padding:30px">
+  <form action="{% url 'add_tag_url' %}" method="post">
+          <div class="input-group">
+            {% csrf_token %}
+            {{ form_tag.title }}
+            <!-- <input type="text" class="form-control text-center" placeholder="Add your new category here" name="category_box"> -->
+            <button class="btn btn-primary" type="submit">Add</button>
+            <!-- <button class="btn btn-danger" type="button">X</button> -->
+          </div>
+  </form>
+</div>
+
+<main class="my-5">
+  <div class="container">
+    <!--Section: Content-->
+    <section class="text-center mt-5">
+        <div class="row">
+          {% for tag in tags %}
+            <div class="col-lg-2 col-md-12 mb-4">
+              <div class="card">
+                <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                  <img src="https://mdbootstrap.com/img/new/standard/nature/00{{ tag.id }}.jpg" class="img-fluid" />
+                  {{ tag.id }}
+                  <a href="#!">
+                    <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                  </a>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">{{ tag.title }}</h5>
+
+                    <a href="{% url 'edit_tag_url' id=tag.id %}" class="btn btn-warning m-1 " style="width: 90%;">Edit</a>
+                    <a href="{% url 'delete_tag_url' id=tag.id %}" class="btn btn-danger px-0" style="width: 90%;">Delete</a>
+                    <hr>
+                    <br>
+                  
+                  <a href="{% url 'tag_to_posts' id=tag.id %}" class="btn btn-primary">Related posts</a>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+              <p></p>
+              <p class="mb-2 pb-1">There is no tag.</p>
+              <p class="mb-2"></p>
+            {% endfor %}
+
+        </div>
+    </section>
+  </div>
+</main>
+
+{% endblock content %}
