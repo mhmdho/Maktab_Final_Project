@@ -27,10 +27,19 @@ class CustomUser(AbstractUser):
         help_text=_('Designates whether the user can log as a supplier.'),
     )
 
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'phone' # phone/email/username
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
     def __str__(self):
         return self.phone
+
+
+class Address(models.Model):
+    lable = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    city = models.CharField(max_length=50)
+    address = models.CharField(max_length=200)
+    zipcode = models.CharField(max_length=10)
+    customer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name="customer_address")

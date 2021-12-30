@@ -1,0 +1,37 @@
+{% extends "admin/login.html" %}
+
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+#header {
+  background-color: #6ed1b5 !important;
+}
+#content {
+  background-color: #e2c9c2 !important;
+}
+#footer {
+  background-color: #e2c9c2 !important;
+}
+input {
+  background-color: #c0c08e !important;
+}
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1><strong>
+
+  <span style="color: #f2f8f6 !important">Babashop Dashboard</span>
+  <br />
+  <small>{% block head_title %}<p>............ welcome ............</p>{% endblock %}</small>
+</strong>
+</h1>
+{% endblock %}
+
+{% block content_title %}
+<p class="lead" style="font-size: larger">
+----  Site Admin Login and Control Panel tools  ----
+</p>
+{% endblock %}

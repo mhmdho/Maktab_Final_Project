@@ -41,7 +41,7 @@ class Shop(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
-    stock = models.IntegerField(default=0)
+    stock = models.IntegerField(default=0, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -60,7 +60,7 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-id']
-
+    
     def get_image(self):
         return self.product_img.get(default=True).image.url
 
@@ -73,6 +73,18 @@ class Image(models.Model):
     image = models.ImageField(upload_to='product_image/')
     default = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if self.default:
+            main_img = self.product.product_img.filter(default=True)
+            main_img.update(default=False)
+        if not self.product.product_img.filter(default=True):
+            main_img = self.product.product_img.all()[0]
+            if main_img:
+                main_img.update(default=True)
+            else:
+                self.default = True
+        return super().save(*args, **kwargs)
+    
     def __str__(self):
         return self.image.url
 

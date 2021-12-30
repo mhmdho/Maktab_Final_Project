@@ -5,9 +5,50 @@ from django.utils.html import format_html
 
 # Register your models here.
 
-admin.site.register(Comment)
-admin.site.register(Category)
-admin.site.register(Tag)
+
+class CommentAdmin(admin.ModelAdmin):
+    search_fields = ('title', 'description')
+    list_filter = ('created_at',)
+    list_display = ('customer', 'post', 'title', 'created_at', 'show_image')
+
+    @admin.display(empty_value='-',description="show image")
+    def show_image(self, obj):
+        if (obj.customer.image):
+            return format_html(
+                '<img src="{}" width=50 height=50/>',
+                obj.customer.image.url,   
+            )
+        return '-'
+
+    fieldsets = (
+    (None, {
+        'fields': (('title', 'post'), 'description', 'customer')
+    }),
+
+    ('more options', {
+        'classes': ('collapse', ),
+        'fields': ('like', ),
+    }),
+    )
+
+admin.site.register(Comment, CommentAdmin)
+
+
+class CagetoryAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+    # list_editable = ('title',)
+
+admin.site.register(Category, CagetoryAdmin)
+
+
+class TagAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+
+admin.site.register(Tag, TagAdmin)
 
 
 class CommentInline(admin.TabularInline):

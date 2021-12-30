@@ -5,9 +5,38 @@ from django.utils.html import format_html
 
 # Register your models here.
 
-admin.site.register(ProductCategory)
-admin.site.register(ProductTag)
-admin.site.register(Image)
+class ProductCagetoryAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+    # list_editable = ('title',)
+
+admin.site.register(ProductCategory, ProductCagetoryAdmin)
+
+
+class ProductTagAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+    # list_editable = ('title',)
+
+admin.site.register(ProductTag, ProductTagAdmin)
+
+
+class ImageAdmin(admin.ModelAdmin):
+    search_fields = ('product',)
+    list_filter = ('default',)
+    list_display = ('product', 'image', 'default', 'show_image')
+
+    @admin.display(empty_value='-',description="show image")
+    def show_image(self, obj):
+        if (obj):
+            return format_html(
+                '<img src="{}" width=50 height=50/>',
+                obj,   
+            )
+        return '-'
+admin.site.register(Image, ImageAdmin)
 
 
 class ShopAdmin(admin.ModelAdmin):
@@ -22,6 +51,16 @@ class ShopAdmin(admin.ModelAdmin):
     actions = [publish_shop]
     list_editable = ('is_confirmed',)
 
+    fieldsets = (
+    (None, {
+        'fields': (('name', 'type'), 'address', ('supplier', 'is_confirmed'))
+    }),
+
+    ('more options', {
+        'classes': ('collapse', ),
+        'fields':  ('is_deleted', ),
+    }),
+)
 
 admin.site.register(Shop, ShopAdmin)
 

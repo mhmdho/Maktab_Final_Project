@@ -17,8 +17,9 @@ class Order(models.Model):
         (CA, "Canceled"),
     )
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
-    total_quantity = models.IntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
+    total_quantity = models.IntegerField(blank=True)
+    # discount = #also add in ERD
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=CH)
@@ -26,11 +27,8 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['created_at',]
-
-    def __str__(self):
-        return self.customer
     
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs): #move to orderitem
         self.total_price = 0
         self.total_quantity = 0
         order_items = self.orderitem_set.all()
@@ -39,12 +37,15 @@ class Order(models.Model):
             self.total_quantity += item.quantity
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'orderd by {self.customer.phone}'
+
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
     quantity = models.IntegerField(default=1)
-    total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -52,6 +53,7 @@ class OrderItem(models.Model):
     
     def save(self, *args, **kwargs):
         self.total_item_price = self.unit_price * self.quantity
+        self.product.stock -= self.quantity  # move to reduce at final when payment done
         return super().save(*args, **kwargs)
 
 

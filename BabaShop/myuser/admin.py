@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CustomUser
+from .models import Address, CustomUser
 from django.utils.html import format_html
 
 # Register your models here.
@@ -9,7 +9,7 @@ from django.utils.html import format_html
 class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ('phone', 'username')
     list_filter = ('is_customer', 'is_supplier')
-    list_display = ('phone', 'email', 'username', 'date_joined', 'is_supplier', 'is_customer', 'show_image')
+    list_display = ('phone', 'email', 'username', 'is_supplier', 'is_customer', 'show_image', 'date_joined')
     date_hierarchy = ('date_joined')
 
     @admin.display(empty_value='-',description="show image")
@@ -36,4 +36,4 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_editable = ('is_customer', 'is_supplier')
 
 admin.site.register(CustomUser, CustomUserAdmin)
-
+# admin.site.register(Address)
