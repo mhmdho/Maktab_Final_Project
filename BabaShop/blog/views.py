@@ -87,6 +87,10 @@ def login_site(request):
             else :
                 print('not found user') #add messege
             return render(request, 'forms/login.html', {'form': form})
+    
+    elif request.user.is_authenticated:
+        return redirect('user_posts_url')
+    
     else:
         form = LoginForm()
 
