@@ -3,6 +3,8 @@ from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
 from .managers import UndeletedShop, DeletedShop
 from myuser.models import CustomUser
+from django.template.defaultfilters import slugify
+import random
 
 # Create your models here.
 
@@ -37,6 +39,23 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def random_number_generator(self):
+        return '_' + str(random.randint(1000, 9999))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name) + '_' + str.lower(self.type)
+            while Shop.objects.filter(slug = self.slug):
+                self.slug = slugify(self.name)
+                self.slug += self.random_number_generator()
+        return super().save(*args, **kwargs)
+    
+    def get_image(self):
+        return self.product_img.get(default=True).image.url
+
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -63,6 +82,17 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-id']
+
+    def random_number_generator(self):
+        return '_' + str(random.randint(1000, 9999))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            while Product.objects.filter(slug = self.slug):
+                self.slug = slugify(self.name)
+                self.slug += self.random_number_generator()
+        return super().save(*args, **kwargs)
     
     def get_image(self):
         return self.product_img.get(default=True).image.url

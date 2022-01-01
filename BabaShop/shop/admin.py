@@ -58,7 +58,7 @@ class ShopAdmin(admin.ModelAdmin):
 
     ('more options', {
         'classes': ('collapse', ),
-        'fields':  ('is_deleted', ),
+        'fields':  ('is_deleted', 'slug'),
     }),
 )
 

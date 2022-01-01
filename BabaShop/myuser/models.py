@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from .managers import CustomUserManager
 from django.core.validators import RegexValidator
+from django.template.defaultfilters import slugify
+import random
 
 # Create your models here.
 
@@ -44,3 +46,17 @@ class Address(models.Model):
     address = models.CharField(max_length=230)
     zipcode = models.CharField(max_length=10)
     customer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name="customer_address")
+
+    def random_number_generator(self):
+        return '_' + str(random.randint(1000, 9999))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.label) + '_address'
+            while Address.objects.filter(slug = self.slug):
+                self.slug = slugify(self.label)
+                self.slug += self.random_number_generator()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.label
