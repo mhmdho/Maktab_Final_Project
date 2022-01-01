@@ -23,6 +23,7 @@ class Shop(models.Model):
         (ORG, "Organic store"),
         (CON, "Convenience store"),
     )
+    slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = CharField(max_length=50)
     type = models.CharField(max_length=17, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
@@ -39,6 +40,7 @@ class Shop(models.Model):
 
 
 class Product(models.Model):
+    slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
     stock = models.IntegerField(default=0, blank=True)

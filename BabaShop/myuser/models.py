@@ -37,6 +37,7 @@ class CustomUser(AbstractUser):
 
 
 class Address(models.Model):
+    slug = models.SlugField(max_length=70, blank=True, unique=True)
     lable = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
