@@ -750,6 +750,10 @@
                                         <div class="widget-content-left">
                                             <div class="widget-heading">Clients</div>
                                             <div class="widget-subheading">Total Clients Profit</div>
+                                            {% for shop in object_list %}
+                                            {{ shop.name }}
+                                            {% endfor %}
+
                                         </div>
                                         <div class="widget-content-right">
                                             <div class="widget-numbers text-white"><span>$ 568</span></div>
