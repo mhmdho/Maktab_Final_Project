@@ -19,7 +19,7 @@ class Order(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     total_quantity = models.IntegerField(blank=True)
-    discount = #also add in ERD
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=CH)
@@ -44,6 +44,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     quantity = models.IntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

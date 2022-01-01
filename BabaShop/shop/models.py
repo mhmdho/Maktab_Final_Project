@@ -27,7 +27,7 @@ class Shop(models.Model):
     name = CharField(max_length=50)
     type = models.CharField(max_length=17, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
-    supplier = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    supplier = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_confirmed = BooleanField(default=False)
     is_deleted = BooleanField(default=False)
 
@@ -43,6 +43,7 @@ class Product(models.Model):
     slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     stock = models.IntegerField(default=0, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])
     created_at = models.DateTimeField(auto_now_add=True)
