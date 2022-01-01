@@ -434,12 +434,14 @@
                         <div class="app-sidebar__inner">
                             <ul class="vertical-nav-menu">
                                 <li class="app-sidebar__heading">Dashboards</li>
+                                {% for shop in object_list %}
                                 <li>
                                     <a href="index.html" class="mm-active">
                                         <i class="metismenu-icon pe-7s-rocket"></i>
-                                        Dashboard Example 1
+                                        {{ shop.name }}
                                     </a>
                                 </li>
+                                {% endfor %}
                                 <li class="app-sidebar__heading">UI Components</li>
                                 <li
                                     
@@ -750,10 +752,6 @@
                                         <div class="widget-content-left">
                                             <div class="widget-heading">Clients</div>
                                             <div class="widget-subheading">Total Clients Profit</div>
-                                            {% for shop in object_list %}
-                                            {{ shop.name }}
-                                            {% endfor %}
-
                                         </div>
                                         <div class="widget-content-right">
                                             <div class="widget-numbers text-white"><span>$ 568</span></div>

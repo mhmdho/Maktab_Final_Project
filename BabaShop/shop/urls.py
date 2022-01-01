@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import OrdersList
+from .views import OrdersList, ShopList
 
 
 urlpatterns = [
-    path('supplier_dashboard/', OrdersList.as_view(), name='supplier_dashboard_url'),
+    path('supplier_dashboard/', ShopList.as_view(), name='supplier_dashboard_url'),
 
 ]
