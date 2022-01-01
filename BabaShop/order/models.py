@@ -19,7 +19,7 @@ class Order(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     total_quantity = models.IntegerField(blank=True)
-    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=CH)
@@ -35,6 +35,7 @@ class Order(models.Model):
         for item in order_items:
             self.total_price += item.total_item_price
             self.total_quantity += item.quantity
+        self.total_price = self.total_price * (1-self.discount)
         return super().save(*args, **kwargs)
 
     def __str__(self):
@@ -44,7 +45,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
-    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
     quantity = models.IntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -53,8 +54,19 @@ class OrderItem(models.Model):
         return self.product.name
     
     def save(self, *args, **kwargs):
-        self.total_item_price = self.unit_price * self.quantity
+        if self.discount < self.product.discount:
+            self.discount = self.product.discount
+        self.total_item_price = self.unit_price * self.quantity * (1-self.discount)
+        
+        print(self.order.total_price)
+        print('------------')
+        print(self.order.id)
+        self.order.total_price += self.total_item_price
+        print(self.order.total_price)
+        self.order.total_quantity += self.quantity
+        
         self.product.stock -= self.quantity  # move to reduce at final when payment done
+        print(self.product.stock)
         return super().save(*args, **kwargs)
 
 
@@ -70,7 +82,7 @@ class ProductComment(models.Model):
 
 
 class ProductLike(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_like")    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_like")   
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     default = models.BooleanField(default=False)
 

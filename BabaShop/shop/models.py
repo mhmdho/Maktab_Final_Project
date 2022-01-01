@@ -43,7 +43,7 @@ class Product(models.Model):
     slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
-    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
     stock = models.IntegerField(default=0, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,15 +77,14 @@ class Image(models.Model):
     default = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        main_img = self.product.product_img.filter(default=True)
         if self.default:
-            main_img = self.product.product_img.filter(default=True)
             main_img.update(default=False)
-        if not self.product.product_img.filter(default=True):
+        if not main_img:
+            self.default = True
+        else:
             main_img = self.product.product_img.all()[0]
-            if main_img:
-                main_img.update(default=True)
-            else:
-                self.default = True
+            main_img.update(default=True)
         return super().save(*args, **kwargs)
     
     def __str__(self):

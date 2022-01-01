@@ -73,7 +73,7 @@ class ImageInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'descrption')
     list_filter = ('category', 'tag', 'shop', 'is_confirmed')
-    list_display = ('name', 'price', 'stock', 'shop', 'is_confirmed', 'show_image')
+    list_display = ('name', 'price', 'stock', 'discount', 'shop', 'is_confirmed', 'show_image')
     date_hierarchy = ('created_at')
 
     @admin.display(empty_value='-',description="show image")
@@ -87,7 +87,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {
-            'fields': (('name', 'price'), 'description', ('shop', 'category'), 'tag', ('stock', 'weight'))
+            'fields': (('name', 'price'), 'description', ('shop', 'category'), 'tag', ('stock', 'weight'), 'discount')
         }),
 
         ('more options', {

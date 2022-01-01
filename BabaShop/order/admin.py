@@ -9,7 +9,7 @@ from django.utils.html import format_html
 class OrderItemAdmin(admin.ModelAdmin):
     search_fields = ('product',)
     list_filter = ('product', 'order')
-    list_display = ('product', 'unit_price', 'quantity', 'total_item_price', 'show_image', 'order')
+    list_display = ('product', 'unit_price', 'quantity', 'total_item_price', 'discount', 'show_image', 'order')
 
     @admin.display(empty_value='-',description="show image")
     def show_image(self, obj):
@@ -22,7 +22,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('product', ('unit_price', 'quantity'), 'order')
+            'fields': ('product', ('unit_price', 'quantity'), 'discount', 'order')
         }),
 
         ('more options', {
@@ -39,12 +39,12 @@ admin.site.register(OrderItem, OrderItemAdmin)
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 3
+    extra = 0
 
 class OrderAdmin(admin.ModelAdmin):
     search_fields = ('product',)
     list_filter = ('status', 'is_payment')
-    list_display = ('customer', 'total_price', 'total_quantity', 'created_at', 'status', 'show_image')
+    list_display = ('customer', 'total_price', 'total_quantity', 'discount', 'created_at', 'status', 'show_image')
 
     @admin.display(empty_value='-',description="show image")
     def show_image(self, obj):
@@ -57,7 +57,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('customer', ('status', 'is_payment'))
+            'fields': ('customer', ('status', 'is_payment'), 'discount')
         }),
 
         ('more options', {
