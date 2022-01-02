@@ -60,11 +60,18 @@ class EditShop(LoginRequiredMixin,UpdateView):
         slug = self.kwargs["slug"]
         return reverse("shop_detail_url", kwargs={"slug": slug})
 
+    def post(self, request, *args, **kwargs):
+        shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
+        shop.update(is_confirmed = False)
+        # return redirect(f'/shop/shop_detail/{self.kwargs["slug"]}')
+        return redirect("shop_detail_url", self.kwargs["slug"])
+
+
 
 class DeleteShop(LoginRequiredMixin,UpdateView):
     model = Shop
 
     def get(self, request, *args, **kwargs):
         shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
-        shop.update(is_deleted = True)
+        shop.update(is_deleted=True, is_confirmed=True)
         return redirect(reverse('supplier_dashboard_url'))
