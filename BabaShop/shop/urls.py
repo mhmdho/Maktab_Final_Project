@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import CreateShop, ShopList
+from .views import CreateShop, ShopDetail, ShopList
 
 
 urlpatterns = [
     path('supplier_dashboard/', ShopList.as_view(), name='supplier_dashboard_url'),
     path('create_shop/', CreateShop.as_view(), name='create_shop_url'),
+    path('shop_detail/<slug:slug>/', ShopDetail.as_view(), name='shop_detail_url'),
 
 ]

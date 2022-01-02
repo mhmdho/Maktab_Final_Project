@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -15,6 +15,14 @@ class ShopList(ListView):
 
     def get_queryset(self):
         return Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+
+
+class ShopDetail(DetailView):
+    model = Shop
+    template_name = 'shop/shop_detail.html'
+
+    def get_queryset(self, *arg, **kwargs):
+        return Shop.Undeleted.filter(slug=self.kwargs['slug'], supplier=self.request.user)
 
 
 class CreateShop(LoginRequiredMixin,View):
