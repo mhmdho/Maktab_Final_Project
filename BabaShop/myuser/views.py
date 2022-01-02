@@ -1,5 +1,5 @@
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from django.views.generic import View
 from django.contrib.auth import authenticate, login
@@ -12,13 +12,11 @@ class SupplierLogin(View):
     
     def get(self, request):
         if request.user.is_authenticated:
-            return HttpResponse('dash')
+            return redirect('supplier_dashboard_url')
 
         return render(request, 'myuser/supplier_login.html')
     
     def post(self, request):
-        print(request.POST.get('username'))
-        print(request.POST.get('pass'))
         user = authenticate(phone=request.POST.get('username'), password=request.POST.get('pass'))
         if user is not None:
             login(request, user)
