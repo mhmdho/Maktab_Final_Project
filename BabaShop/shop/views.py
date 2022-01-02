@@ -6,6 +6,8 @@ from django.views.generic import ListView, DetailView, UpdateView
 from django.views.generic.base import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
+
 
 from shop.models import Shop
 from shop.forms import CreateShopForm
@@ -58,3 +60,11 @@ class EditShop(LoginRequiredMixin,UpdateView):
         slug = self.kwargs["slug"]
         return reverse("shop_detail_url", kwargs={"slug": slug})
 
+
+class DeleteShop(LoginRequiredMixin,UpdateView):
+    model = Shop
+
+    def get(self, request, *args, **kwargs):
+        shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
+        shop.update(is_deleted = True)
+        return redirect(reverse('supplier_dashboard_url'))

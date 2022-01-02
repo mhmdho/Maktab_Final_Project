@@ -686,7 +686,7 @@
                                         <i class="fa fa-edit"></i>
                                     </a>
                                     {% if shop.is_confirmed %}
-                                    <a href="{% url 'supplier_dashboard_url' %}" type="button" data-toggle="tooltip" title="Delete Shop" data-placement="bottom" class="btn-shadow mr-3 btn btn-secondary">
+                                    <a href="{% url 'delete_shop_url' slug=shop.slug %}" type="button" data-toggle="tooltip" title="Delete Shop" data-placement="bottom" class="btn-shadow mr-3 btn btn-secondary">
                                         <i class="fa fa-trash"></i> </a>
                                     </a>
                                     {% endif %}
