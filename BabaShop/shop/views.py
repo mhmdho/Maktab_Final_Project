@@ -1,7 +1,11 @@
+from typing_extensions import Required
+from django.db.models.query import QuerySet
 from django.shortcuts import redirect, render
-from django.views.generic import ListView, DetailView
+from django.urls.base import reverse_lazy
+from django.views.generic import ListView, DetailView, UpdateView
 from django.views.generic.base import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 from shop.models import Shop
 from shop.forms import CreateShopForm
@@ -44,3 +48,13 @@ class CreateShop(LoginRequiredMixin,View):
             form.save()
             return redirect('supplier_dashboard_url')
     
+
+class EditShop(LoginRequiredMixin,UpdateView):
+    template_name = 'shop/edit_shop.html'
+    model = Shop
+    form_class = CreateShopForm
+
+    def get_success_url(self):
+        slug = self.kwargs["slug"]
+        return reverse("shop_detail_url", kwargs={"slug": slug})
+
