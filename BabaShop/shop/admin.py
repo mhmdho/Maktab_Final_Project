@@ -67,7 +67,7 @@ admin.site.register(Shop, ShopAdmin)
 
 class ImageInline(admin.TabularInline):
     model = Image
-    extra = 0
+    extra = 1
 
 
 class ProductAdmin(admin.ModelAdmin):

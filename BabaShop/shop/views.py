@@ -40,12 +40,12 @@ class ShopDetail(DetailView):
 
 
 class CreateShop(LoginRequiredMixin,View):
-    template_name = 'shop/create_shop.html'
+    template_name = 'forms/create_shop.html'
     form_class = CreateShopForm
 
     def get(self, request):
         form = CreateShopForm()
-        return render(request, 'shop/create_shop.html',{'form': form})
+        return render(request, 'forms/create_shop.html',{'form': form})
 
     def post(self, request):
         notconfirmed = Shop.Undeleted.filter(is_confirmed=False ,supplier=request.user).count()
@@ -81,3 +81,6 @@ class DeleteShop(LoginRequiredMixin,UpdateView):
         shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
         shop.update(is_deleted=True, is_confirmed=True)
         return redirect(reverse('supplier_dashboard_url'))
+
+class CreateProduct(LoginRequiredMixin,TemplateView):
+    template_name = 'forms/create_product.html'
