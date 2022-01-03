@@ -42,7 +42,7 @@ admin.site.register(Image, ImageAdmin)
 class ShopAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('type', 'is_confirmed', 'is_deleted')
-    list_display = ('name', 'type', 'address', 'supplier', 'is_confirmed')
+    list_display = ('name', 'type', 'address', 'supplier', 'is_confirmed', 'is_deleted')
     
     @admin.action(description='Select shops to confirmed')
     def publish_shop(modeladmin, request, queryset):
