@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 
 from shop.models import Shop, Product
-from shop.forms import CreateShopForm
+from shop.forms import CreateShopForm, CreateProductForm
 
 # Create your views here.
 
@@ -82,5 +82,18 @@ class DeleteShop(LoginRequiredMixin,UpdateView):
         shop.update(is_deleted=True, is_confirmed=True)
         return redirect(reverse('supplier_dashboard_url'))
 
-class CreateProduct(LoginRequiredMixin,TemplateView):
+
+class CreateProduct(LoginRequiredMixin, View):
     template_name = 'forms/create_product.html'
+    form_class = CreateProductForm
+
+    def get(self, request):
+        form = CreateProductForm()
+        return render(request, 'forms/create_Product.html',{'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = CreateShopForm(request.POST)
+        if form.is_valid():
+            form.instance.shop = self.kwargs
+            form.save()
+            return redirect("shop_detail_url", self.kwargs["slug"])
