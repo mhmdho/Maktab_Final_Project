@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Count, Sum
+from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView, UpdateView
 from django.views.generic.base import TemplateView, View
@@ -6,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
+from shop.forms import AddImageForm
 
 from shop.models import Shop, Product
 from order.models import Order
@@ -104,18 +106,23 @@ class CreateProduct(LoginRequiredMixin, CreateView):
     login_url = '/myuser/supplier_login/'
     form_class = CreateProductForm
 
+    # def form_valid(self, form):
+    #     obj = form.save(commit=False)
+    #     obj.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
+    #     return super(CreateProduct, self).form_valid(form)
+
     def post(self, request, *args, **kwargs):
         form = CreateProductForm(request.POST, request.FILES)
-        # form_img = AddImageForm(request.POST)
+
+        form_img = AddImageForm(request.POST)
+        
         form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
 
-        print(form.instance.shop)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
             form.save()
-
-            # form_img.save()
-            return redirect(reverse("shop_detail_url", self.kwargs["slug"]))
+            form_img.save()
+            return redirect("shop_detail_url", self.kwargs["slug"])
 
         # return redirect("shop_detail_url", self.kwargs["slug"])
+        # return HttpResponse("shop_detail_url")
+

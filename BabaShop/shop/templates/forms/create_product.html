@@ -740,10 +740,6 @@
                                     <div class="card-body"><h5 class="card-title mb-5">New Product</h5>
                                         <form enctype="multipart/form-data" action='{% url "create_product_url" slug=request.resolver_match.kwargs.slug %}' method="post" class="">
                                             {% csrf_token %}
-                                            {{ form.management_form }}
-                                            {{ form.errors }}
-                                            {{ form.non_field_errors }}
-                                            {{ form.non_form_errors }}
 
                                             <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Name</label>
                                                 <div class="col-sm-10">
@@ -781,7 +777,7 @@
                                             
                                             <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Description</label>
                                                 <div class="col-sm-10">
-                                                    <textarea name="text" id="exampleText" class="form-control"></textarea>
+                                                    {{ form.description }}
                                                 </div>
                                             </div>
 
@@ -799,7 +795,7 @@
                                             
                                             <div class="position-relative row form-group"><label for="exampleFile" class="col-sm-2 col-form-label">Image</label>
                                                 <div class="col-sm-10">
-                                                    {{ form.shop }}
+
                                                     <small class="form-text text-muted">This is your product image. It helps to sell your product more better.</small>
                                                 </div>
                                             </div>
