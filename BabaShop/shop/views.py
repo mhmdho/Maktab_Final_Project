@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Count, Sum
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView, UpdateView
 from django.views.generic.base import TemplateView, View
@@ -7,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
 
 from shop.models import Shop, Product
+from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
 
 # Create your views here.
@@ -40,6 +42,13 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         for pro in context['product_list'].filter(is_active=True):
             total_product_stock += pro.stock
         context['total_product_stock'] = total_product_stock
+        context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('created_at')
+        context['order_count'] = context['order_list'].count()
+        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
+        orders_value  = 0
+        for ord in context['order_list']:
+            orders_value += ord.total_price
+        context['orders_value'] = orders_value
         return context
 
 
@@ -95,18 +104,17 @@ class CreateProduct(LoginRequiredMixin, CreateView):
     login_url = '/myuser/supplier_login/'
     form_class = CreateProductForm
 
-
-
     def post(self, request, *args, **kwargs):
-        form = CreateProductForm(request.POST)
+        form = CreateProductForm(request.POST, request.FILES)
         # form_img = AddImageForm(request.POST)
         form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
 
         print(form.instance.shop)
         if form.is_valid():
-
-            print(form)
+            obj = form.save(commit=False)
+            obj.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
             form.save()
+
             # form_img.save()
             return redirect(reverse("shop_detail_url", self.kwargs["slug"]))
 
