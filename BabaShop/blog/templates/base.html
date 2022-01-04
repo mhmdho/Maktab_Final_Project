@@ -38,9 +38,20 @@
       <div class="container-fluid">
         <!-- Navbar brand -->
         {% if request.user.id %}
-          <a class="navbar-brand" href="{% url 'user_posts_url' %}"> <strong class="text-uppercase">{{ request.user.phone }}</strong> </a>
-          <a class="navbar-brand" href="{% url 'change_password_url' %}"> password </a>
-          <a class="navbar-brand" href="{% url 'logout_url' %}"> Logout </a>
+          <div class="dropdown text-center ms-4 me-5">
+            <strong class="text-uppercase">{{ request.user.email }} </strong>
+            <div class="dropdown-content">
+              <hr>
+              {% if request.user.is_supplier %}
+              <a href="{% url 'user_posts_url' %}"> blog-dashboard</a>
+              <a href="{% url 'supplier_login_url' %}"> shop-dashboard </a>
+              {% endif %}
+              <a href="{% url 'change_password_url' %}">change password</a>
+              <hr>
+              <a href="{% url 'logout_url' %}"> Logout </a>
+              <hr>
+            </div>
+          </div>
         {% else %} 
           <a class="navbar-brand" href="{% url 'login_url' %}"> Login </a>
         {% endif %}
