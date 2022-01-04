@@ -46,7 +46,7 @@ class Shop(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name) + '_' + str.lower(self.type)
+            self.slug = slugify(self.name) + '_' + str.lower(self.type).replace(" ","_")
             while Shop.objects.filter(slug = self.slug):
                 self.slug = slugify(self.name)
                 self.slug += self.random_number_generator()

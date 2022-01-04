@@ -28,7 +28,7 @@ class ImageAdmin(admin.ModelAdmin):
     list_filter = ('default',)
     list_display = ('product', 'image', 'default', 'show_image')
 
-    @admin.display(empty_value='-',description="show image")
+    @admin.display(empty_value='-', description="show image")
     def show_image(self, obj):
         if (obj):
             return format_html(

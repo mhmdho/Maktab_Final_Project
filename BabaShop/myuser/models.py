@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from .managers import CustomUserManager
 from django.core.validators import RegexValidator
-from django.template.defaultfilters import slugify
+from django.template.defaultfilters import default, slugify
 import random
 
 # Create your models here.
@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
     phone_regex = RegexValidator(regex=r'^09\d{9}$', message="Phone number must be entered in the format: '+989121234567'.")
     phone = models.CharField(validators=[phone_regex], max_length=11, unique=True) # validators should be a list
     
-    image = models.ImageField(upload_to='user_image/', null=True, blank=True)
+    image = models.ImageField(upload_to='user_image/', default='user_image/avatar.jpg', null=True, blank=True)
     last_login = models.DateTimeField(auto_now=True)
 
     is_customer = models.BooleanField(

@@ -5,6 +5,8 @@ from django.shortcuts import redirect, render
 from django.views.generic import View
 from django.contrib.auth import authenticate, login
 
+from shop.models import Shop
+
 # Create your views here.
 
 
@@ -13,7 +15,8 @@ class SupplierLogin(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('supplier_dashboard_url')
+            slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
+            return redirect('shop_detail_url', slug=slug)
 
         return render(request, 'myuser/supplier_login.html')
     
@@ -21,6 +24,7 @@ class SupplierLogin(View):
         user = authenticate(phone=request.POST.get('username'), password=request.POST.get('pass'))
         if user is not None:
             login(request, user)
-            return redirect('supplier_dashboard_url')
+            slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
+            return redirect('shop_detail_url', slug=slug)
 
         return render(request, 'myuser/supplier_login.html')
