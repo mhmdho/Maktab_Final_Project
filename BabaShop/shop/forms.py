@@ -1,7 +1,6 @@
 from django.forms import ModelForm, Textarea, TextInput
-from django.forms.fields import ChoiceField
-from django.forms.widgets import CheckboxSelectMultiple, ClearableFileInput, NumberInput, RadioSelect, Select, SelectMultiple
-from .models import Product, Shop
+from django.forms.widgets import CheckboxInput, ClearableFileInput, NumberInput, RadioSelect, Select, SelectMultiple
+from .models import Image, Product, Shop
 
 
 class CreateShopForm(ModelForm):
@@ -33,21 +32,27 @@ class CreateProductForm(ModelForm):
                                     'placeholder': 'Enter like: 0.15  - It is equal to 15%'}),
 
             'stock': NumberInput(attrs={'class':'form-control', 
-                                    'placeholder': '0'}),
+                                    'placeholder': ''}),
 
             'weight': NumberInput(attrs={'class':'form-control', 
                                     'placeholder': '450 (gr)'}),
 
-            'description': TextInput(attrs={'class':'form-control', 
+            'description': Textarea(attrs={'class':'form-control', 
                                     'placeholder': ""}),
 
             'category': Select(attrs={'class':'form-control', 
                                     'placeholder': ""}),
 
             'tag': SelectMultiple(attrs={'class':'form-control', 
-                                    'placeholder': "choose"}),
+                                    'placeholder': ""}),
 
-            'image': ClearableFileInput(attrs={'class':'form-control-file'}),
+            'is_active': CheckboxInput(attrs={'class':'form-check-input'}),
+        }
 
-            'is_active': RadioSelect(attrs={'class':'form-check-input'}),
+class AddImageForm(ModelForm):
+    class Meta:
+        model = Image
+        exclude = ['product', 'defalut']
+        widgets = {
+            'get_image': ClearableFileInput(attrs={'class':'form-control-file'}),
         }

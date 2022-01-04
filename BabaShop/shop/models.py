@@ -1,3 +1,4 @@
+from typing_extensions import Required
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
@@ -71,7 +72,8 @@ class Product(models.Model):
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE) 
     tag = models.ManyToManyField('ProductTag', blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
-    # image = models.ImageField(upload_to='product_image/')
+    # image = models.FileField(upload_to='product_image/')
+    # image = models.ForeignKey("Image", Required=True)
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)

@@ -4,6 +4,7 @@ from django.views.generic.base import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.views.generic.edit import CreateView
 
 from shop.models import Shop, Product
 from shop.forms import CreateShopForm, CreateProductForm
@@ -11,17 +12,20 @@ from shop.forms import CreateShopForm, CreateProductForm
 # Create your views here.
 
 
-class ShopList(ListView):
-    model = Shop
+class ShopList(LoginRequiredMixin, ListView):
     template_name = 'shop/supplier_dashboard.html'
+    login_url = '/myuser/supplier_login/'
+    model = Shop
+    permission_denied_message = 'Your are not login'
 
     def get_queryset(self):
         return Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
 
 
-class ShopDetail(DetailView):
-    model = Shop
+class ShopDetail(LoginRequiredMixin, DetailView):
     template_name = 'shop/shop_detail.html'
+    login_url = '/myuser/supplier_login/'
+    model = Shop
 
     def get_queryset(self, *arg, **kwargs):
         return Shop.Undeleted.filter(slug=self.kwargs['slug'], supplier=self.request.user)
@@ -39,8 +43,9 @@ class ShopDetail(DetailView):
         return context
 
 
-class CreateShop(LoginRequiredMixin,View):
+class CreateShop(LoginRequiredMixin, View):
     template_name = 'forms/create_shop.html'
+    login_url = '/myuser/supplier_login/'
     form_class = CreateShopForm
 
     def get(self, request):
@@ -61,6 +66,7 @@ class CreateShop(LoginRequiredMixin,View):
 
 class EditShop(LoginRequiredMixin,UpdateView):
     template_name = 'shop/edit_shop.html'
+    login_url = '/myuser/supplier_login/'
     model = Shop
     form_class = CreateShopForm
 
@@ -75,25 +81,33 @@ class EditShop(LoginRequiredMixin,UpdateView):
 
 
 class DeleteShop(LoginRequiredMixin,UpdateView):
+    login_url = '/myuser/supplier_login/'
     model = Shop
 
     def get(self, request, *args, **kwargs):
-        shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
+        shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
         shop.update(is_deleted=True, is_confirmed=True)
         return redirect(reverse('supplier_dashboard_url'))
 
 
-class CreateProduct(LoginRequiredMixin, View):
+class CreateProduct(LoginRequiredMixin, CreateView):
     template_name = 'forms/create_product.html'
+    login_url = '/myuser/supplier_login/'
     form_class = CreateProductForm
 
-    def get(self, request):
-        form = CreateProductForm()
-        return render(request, 'forms/create_Product.html',{'form': form})
+
 
     def post(self, request, *args, **kwargs):
-        form = CreateShopForm(request.POST)
+        form = CreateProductForm(request.POST)
+        # form_img = AddImageForm(request.POST)
+        form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
+
+        print(form.instance.shop)
         if form.is_valid():
-            form.instance.shop = self.kwargs
+
+            print(form)
             form.save()
-            return redirect("shop_detail_url", self.kwargs["slug"])
+            # form_img.save()
+            return redirect(reverse("shop_detail_url", self.kwargs["slug"]))
+
+        # return redirect("shop_detail_url", self.kwargs["slug"])

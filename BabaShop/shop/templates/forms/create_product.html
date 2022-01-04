@@ -738,12 +738,16 @@
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-1" role="tabpanel">
                                 <div class="main-card mb-3 card">
                                     <div class="card-body"><h5 class="card-title mb-5">New Product</h5>
-                                        <form action='{% url "create_product_url" %}' method="post" class="">
+                                        <form action='{% url "create_product_url" slug=request.resolver_match.kwargs.slug %}' method="post" class="">
                                             {% csrf_token %}
+                                            {{ form.management_form }}
+                                            {{ form.errors }}
+                                            {{ form.non_field_errors }}
+                                            {{ form.non_form_errors }}
 
                                             <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Name</label>
                                                 <div class="col-sm-10">
-                                                    <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email" class="form-control">
+                                                    {{ form.name }}
                                                 </div>
                                             </div>
 
@@ -751,12 +755,12 @@
                                                 
                                                 <label for="exampleNumber" class="col-sm-2 col-form-label">Price</label>
                                                 <div class="col-sm-4">
-                                                    <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email" class="form-control">
+                                                    {{ form.price }}
                                                 </div>
 
                                                 <label for="exampleDecimal" class="col-sm-2 col-form-label">Discount</label>
                                                 <div class="col-sm-4">
-                                                    <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email" class="form-control">
+                                                    {{ form.discount }}
                                                 </div>
 
                                             </div>
@@ -765,37 +769,46 @@
                                                 
                                                 <label for="exampleNumber" class="col-sm-2 col-form-label">Stock</label>
                                                 <div class="col-sm-4">
-                                                    <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email" class="form-control">
+                                                    {{ form.stock }}
                                                 </div>
 
                                                 <label for="exampleNumber" class="col-sm-2 col-form-label">Weight</label>
                                                 <div class="col-sm-4">
-                                                    <input name="email" id="exampleEmail" placeholder="with a placeholder" type="email" class="form-control">
+                                                    {{ form.weight }}
                                                 </div>
 
                                             </div>
                                             
                                             <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Description</label>
-                                                <div class="col-sm-10"><textarea name="text" id="exampleText" class="form-control"></textarea></div>
+                                                <div class="col-sm-10">
+                                                    <textarea name="text" id="exampleText" class="form-control"></textarea>
+                                                </div>
                                             </div>
 
                                             <div class="position-relative row form-group"><label for="exampleSelect" class="col-sm-2 col-form-label">Category</label>
-                                                <div class="col-sm-10"><select name="select" id="exampleSelect" class="form-control"></select></div>
+                                                <div class="col-sm-10">
+                                                    {{ form.category }}
+                                                </div>
                                             </div>
                                             <div class="position-relative row form-group"><label for="exampleSelectMulti" class="col-sm-2 col-form-label">Tag</label>
-                                                <div class="col-sm-10"><select multiple="" name="selectMulti" id="exampleSelectMulti" class="form-control"></select></div>
+                                                <div class="col-sm-10">
+                                                    {{ form.tag }}
+                                                </div>
                                             </div>
 
                                             
                                             <div class="position-relative row form-group"><label for="exampleFile" class="col-sm-2 col-form-label">Image</label>
-                                                <div class="col-sm-10"><input name="file" id="exampleFile" type="file" class="form-control-file">
+                                                <div class="col-sm-10">
+                                                    {{ form.shop }}
                                                     <small class="form-text text-muted">This is your product image. It helps to sell your product more better.</small>
                                                 </div>
                                             </div>
 
                                             <div class="position-relative row form-group"><label for="checkbox2" class="col-sm-2 col-form-label">Active</label>
                                                 <div class="col-sm-10">
-                                                    <div class="position-relative form-check"><label class="form-check-label"><input id="checkbox2" type="checkbox" class="form-check-input">Available In Stock</label></div>
+                                                    <div class="position-relative form-check"><label class="form-check-label">
+                                                        {{ form.is_active }}
+                                                        Available In Stock</label></div>
                                                 </div>
                                             </div>
                                             <br>
@@ -803,7 +816,7 @@
                                             <div class="position-relative row form-check">
                                                 <div class="col-sm-10 offset-sm-2 px-0">
                                                     <button class="btn btn-secondary">Create</button>
-                                                    <a href='{% url "supplier_dashboard_url" %}' class="btn btn-danger mx-3">Cancel</a>
+                                                    <a href='{% url "shop_detail_url" slug=request.resolver_match.kwargs.slug %}' class="btn btn-danger mx-3">Cancel</a>
                                                 </div>
                                             </div>
 

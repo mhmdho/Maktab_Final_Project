@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
 from .models import Address, CustomUser
 from django.utils.html import format_html
@@ -11,7 +12,7 @@ class AddressInline(admin.TabularInline):
     exclude = ('slug',)
     extra = 1
 
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     search_fields = ('phone', 'username')
     list_filter = ('is_customer', 'is_supplier')
     list_display = ('phone', 'email', 'username', 'is_supplier', 'is_customer', 'show_image', 'date_joined')
@@ -26,6 +27,12 @@ class CustomUserAdmin(admin.ModelAdmin):
             )
         return '-'
     
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (('phone', 'email', 'username'), 'password1', 'password2')
+        }),
+    )
     fieldsets = (
         (None, {
             'fields': (('phone', 'password'), ('username', 'email'), ('is_customer', 'is_supplier'))

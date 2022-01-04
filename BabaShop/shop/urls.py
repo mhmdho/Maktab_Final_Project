@@ -9,6 +9,6 @@ urlpatterns = [
     path('edit_shop/<slug:slug>/', EditShop.as_view(), name='edit_shop_url'),
     path('delete_shop/<slug:slug>/', DeleteShop.as_view(), name='delete_shop_url'),
 
-    path('create_product/', CreateProduct.as_view(), name='create_product_url'),
+    path('create_product/<slug:slug>/', CreateProduct.as_view(), name='create_product_url'),
 
 ]

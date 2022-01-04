@@ -28,6 +28,9 @@ class Order(models.Model):
     class Meta:
         ordering = ['created_at',]
     
+    # def total_price(self):
+    #     pass
+
     def save(self, *args, **kwargs): #move to orderitem
         self.total_price = 0
         self.total_quantity = 0
