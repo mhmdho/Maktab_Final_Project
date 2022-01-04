@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 
 from django.views.generic import View
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 from shop.models import Shop
 
@@ -23,8 +23,16 @@ class SupplierLogin(View):
     def post(self, request):
         user = authenticate(phone=request.POST.get('username'), password=request.POST.get('pass'))
         if user is not None:
-            login(request, user)
-            slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
-            return redirect('shop_detail_url', slug=slug)
+            if user.is_supplier:
+                login(request, user)
+                slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
+                return redirect('shop_detail_url', slug=slug)
+            return HttpResponse("You are not a supplier.")
 
+        return render(request, 'myuser/supplier_login.html')
+
+
+class SupplierLogout(View):
+    def get(self, request):
+        logout(request)
         return render(request, 'myuser/supplier_login.html')

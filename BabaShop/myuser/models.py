@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from .managers import CustomUserManager
 from django.core.validators import RegexValidator
-from django.template.defaultfilters import default, slugify
+from django.template.defaultfilters import slugify
 import random
 
 # Create your models here.
