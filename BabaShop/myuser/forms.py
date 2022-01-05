@@ -1,10 +1,10 @@
 from django import forms
 from django.forms import TextInput
+from django.forms import Form
 from django.forms.widgets import EmailInput
 from .models import CustomUser
-from django import forms
 
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
 
@@ -56,3 +56,20 @@ class SupplierRegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class SupplierLoginForm(Form):
+    phone = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Phone',
+            'class':'form-control',           
+            'autofocus': True}))
+    
+    password = forms.CharField(
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Password',
+            'class':'form-control', 
+            'id': "password-field",
+            'autocomplete': 'current-password'}),
+    )

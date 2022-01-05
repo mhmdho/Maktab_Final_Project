@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 
 from django.views.generic import View
@@ -8,13 +7,16 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from myuser.models import CustomUser
 from shop.models import Shop
-from myuser.forms import SupplierRegisterForm
+from myuser.forms import SupplierRegisterForm, SupplierLoginForm
+from django.contrib.auth.views import LoginView, LogoutView
+
 
 # Create your views here.
 
 
-class SupplierLogin(View):
-    template_name = 'myuser/supplier_login.html'
+class SupplierLogin(LoginView):
+    template_name = 'forms/supplier_login.html'
+    form_class = SupplierLoginForm
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -23,33 +25,35 @@ class SupplierLogin(View):
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
             return redirect('create_shop_url')
-        form = SupplierRegisterForm()
+        form = SupplierLoginForm()
         return render(request, 'forms/supplier_login.html', {'form': form})
     
     def post(self, request):
-        user = authenticate(phone=request.POST.get('username'), password=request.POST.get('pass'))
-        if user is not None:
-            if user.is_supplier and user.is_active:
-                form = SupplierRegisterForm(request.POST)
-                if form.is_valid():
-                    login(request, user)
-                    shop = Shop.Undeleted.filter(supplier=self.request.user).first()
-                    messages.success(request, "Login successfully." )
-                    if shop:
-                        return redirect('shop_detail_url', slug=shop.slug)
-                    return redirect('create_shop_url')
-            messages.success(request, "You are not a supplier or your acount suspended." )
-            return render(request, 'myuser/supplier_login.html')
+        form = SupplierLoginForm(request.POST)
+        print(form)
+        if form.is_valid():
+            user = authenticate(phone=form.cleaned_data['phone'], password=form.cleaned_data['password'])
+            if user is not None:
+                if user.is_supplier and user.is_active:
+                        login(request, user)
+                        shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+                        messages.success(request, "Login successfully." )
+                        if shop:
+                            return redirect('shop_detail_url', slug=shop.slug)
+                        return redirect('create_shop_url')
+                messages.info(request, "You are not a supplier or your acount suspended." )
+                return redirect('supplier_login_url')
 
         messages.error(request, "Unsuccessful login. Invalid user" )
-        return render(request, 'myuser/supplier_login.html')
+        return redirect('supplier_login_url')
 
 
-class SupplierLogout(View):
+class SupplierLogout(LogoutView):
+    # next_page = 'supplier_login_url'
     def get(self, request):
         logout(request)
         messages.info(request, "logout successfully." )
-        return render(request, 'myuser/supplier_login.html')
+        return redirect('supplier_login_url')
 
 
 class SupplierRegister(CreateView):

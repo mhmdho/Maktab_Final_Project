@@ -150,3 +150,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.INFO: 'warning',
  }
+
+AUTHENTICATION_BACKENDS = [
+    'myuser.backends.AuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
