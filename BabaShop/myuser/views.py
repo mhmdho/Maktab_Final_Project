@@ -18,6 +18,7 @@ class SupplierLogin(View):
 
     def get(self, request):
         if request.user.is_authenticated:
+            messages.success(request, "Your are loged in before." )
             shop = Shop.Undeleted.filter(supplier=self.request.user).first()
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
@@ -32,17 +33,21 @@ class SupplierLogin(View):
             if user.is_supplier and user.is_active:
                 login(request, user)
                 shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+                messages.success(request, "Login successfully." )
                 if shop:
                     return redirect('shop_detail_url', slug=shop.slug)
                 return redirect('create_shop_url')
-            return HttpResponse("You are not a supplier.")
+            messages.success(request, "You are not a supplier or your acount suspended." )
+            return render(request, 'myuser/supplier_login.html')
 
+        messages.success(request, "Unsuccessful login. Invalid user" )
         return render(request, 'myuser/supplier_login.html')
 
 
 class SupplierLogout(View):
     def get(self, request):
         logout(request)
+        messages.success(request, "logout successfully." )
         return render(request, 'myuser/supplier_login.html')
 
 
@@ -55,6 +60,7 @@ class SupplierRegister(CreateView):
     def get(self, request):
         if request.user.is_authenticated:
             slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
+            messages.success(request, "Your are loged in before." )
             return redirect('shop_detail_url', slug=slug)
         form = SupplierRegisterForm()
         return render(request, 'forms/supplier_register.html',{'form': form})
@@ -63,7 +69,7 @@ class SupplierRegister(CreateView):
         form = SupplierRegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Registration successful." )
+            messages.success(request, "Registration was successful." )
             return redirect('supplier_login_url')
-
+        messages.error(request, "Invalid Input!." )
         return render(request, 'myuser/supplier_login.html')

@@ -1,13 +1,13 @@
 from django.contrib import messages
-from django.db.models.aggregates import Count, Sum
-from django.http.response import HttpResponse
+from django.db.models.aggregates import Count
 from django.shortcuts import redirect, render
-from django.views.generic import ListView, DetailView, UpdateView
-from django.views.generic.base import TemplateView, View
+from django.views.generic import DetailView, UpdateView
+from django.views.generic.base import ContextMixin, TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 from shop.forms import AddImageForm
 
 from shop.models import Shop, Product
@@ -15,16 +15,6 @@ from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
 
 # Create your views here.
-
-
-class ShopList(LoginRequiredMixin, ListView):
-    template_name = 'shop/supplier_dashboard.html'
-    login_url = '/myuser/supplier_login/'
-    model = Shop
-    permission_denied_message = 'Your are not login'
-
-    def get_queryset(self):
-        return Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
 
 
 class ShopDetail(LoginRequiredMixin, DetailView):
@@ -60,6 +50,10 @@ class CreateShop(LoginRequiredMixin, View):
     login_url = '/myuser/supplier_login/'
     form_class = CreateShopForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+
     def get(self, request):
         form = CreateShopForm()
         return render(request, 'forms/create_shop.html',{'form': form})
@@ -77,11 +71,16 @@ class CreateShop(LoginRequiredMixin, View):
             return redirect('shop_detail_url')
     
 
-class EditShop(LoginRequiredMixin,UpdateView):
+class EditShop(LoginRequiredMixin,UpdateView, ContextMixin):
     template_name = 'shop/edit_shop.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
     form_class = CreateShopForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        return context
 
     def get_success_url(self):
         slug = self.kwargs["slug"]
@@ -100,7 +99,11 @@ class DeleteShop(LoginRequiredMixin,UpdateView):
     def get(self, request, *args, **kwargs):
         shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
         shop.update(is_deleted=True, is_confirmed=True)
-        return redirect(reverse('supplier_dashboard_url'))
+        shop = Shop.Undeleted.filter(supplier=self.request.user)
+        messages.info(request, "You deleted the shop." )
+        if shop:
+            return redirect('shop_detail_url', slug=shop.slug)
+        return redirect('create_shop_url')
 
 
 class CreateProduct(LoginRequiredMixin, CreateView):
