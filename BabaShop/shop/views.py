@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models.aggregates import Count, Sum
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
@@ -64,15 +65,16 @@ class CreateShop(LoginRequiredMixin, View):
         return render(request, 'forms/create_shop.html',{'form': form})
 
     def post(self, request):
-        notconfirmed = Shop.Undeleted.filter(is_confirmed=False ,supplier=request.user).count()
-        if notconfirmed != 0:
-            return redirect('supplier_dashboard_url')
+        not_confirmed = Shop.Undeleted.filter(is_confirmed=False ,supplier=request.user).first().slug
+        if not_confirmed:
+            messages.error(request, "You have unconfirmed shop." )
+            return redirect('shop_detail_url', slug=not_confirmed)
         form = CreateShopForm(request.POST)
         if form.is_valid():
             form.instance.supplier = request.user
             print(form)
             form.save()
-            return redirect('supplier_dashboard_url')
+            return redirect('shop_detail_url')
     
 
 class EditShop(LoginRequiredMixin,UpdateView):

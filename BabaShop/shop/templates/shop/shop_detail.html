@@ -496,6 +496,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div class="page-title-actions">
                                     <a href="{% url 'edit_shop_url' slug=shop.slug %}" type="button" data-toggle="tooltip" title="Edit Shop" data-placement="bottom" class="btn-shadow mr-3 btn btn-secondary">
                                         <i class="fa fa-edit"></i>
@@ -575,8 +576,22 @@
                                         {% endif %}
 
                                     </div>
-                                </div>    
+                                </div> 
                             </div>
+
+                            {% if messages %}
+                            <div class="justify-content-center p-0 m-0">
+                                <ul class="messages justify-content-center p-0 m-0">
+                                    {% for message in messages %}
+                                        <p  class="text-center {% if message.tags %}{{ message.tags }}{% endif %} p-0 m-0 text-danger">
+                                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                                            {{ message }}
+                                        </p>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
                         </div>            
                         
                         <div class="row">
