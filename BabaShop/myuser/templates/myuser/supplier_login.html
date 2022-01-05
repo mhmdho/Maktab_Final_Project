@@ -2,19 +2,21 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-  	<title>BabaShop | Login</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<head>
+	<title>BabaShop | Login</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	
+
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-	</head>
-	<body class="img js-fullheight" style="background-image: url({% static 'images/bg.jpg' %})">
+</head>
+
+<body class="img js-fullheight" style="background-image: url({% static 'images/bg.jpg' %})">
 	<section class="ftco-section pb-0 pt-4">
 		<div class="container">
 			<div class="row justify-content-center">
@@ -27,50 +29,68 @@
 				<div class="col-md-5 col-lg-5"></div>
 				<div class="col-md-5 col-lg-5">
 					<div class="login-wrap p-0">
-		      	<h3 class="mb-4 text-center">Login</h3>
-				
-				<!-- <form action="#" class="signin-form"> -->
-				<form action='{% url "supplier_login_url" %}' method="post">
-					{% csrf_token %}
+						<h3 class="mb-4 text-center">Login</h3>
 
-		      		<div class="form-group">
-		      			<input type="text" class="form-control" name="username" placeholder="Username" required>
-		      		</div>
-	            <div class="form-group">
-	              <input id="password-field" type="password" class="form-control" name="pass" placeholder="Password" required>
-	              <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-	            </div>
-	            <div class="form-group">
-	            	<button type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
-	            </div>
-	            <div class="form-group d-md-flex">
-	            	<div class="w-50">
-		            	<label class="checkbox-wrap checkbox-primary">Remember Me
-									  <input type="checkbox" checked>
-									  <span class="checkmark"></span>
+						{% if messages %}
+						<div class="messages text-center p-0 mt-0 mb-2" style="background: transparent;
+								background: #fcfcfc3d;
+								border-radius: 10px;">
+							{% for message in messages %}
+							<b class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
+								{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+								{{ message }}
+							</b>
+							{% endfor %}
+						</div>
+						{% endif %}
+
+						<!-- <form action="#" class="signin-form"> -->
+						<form action='{% url "supplier_login_url" %}' method="post">
+							{% csrf_token %}
+
+							<div class="form-group">
+								<input type="text" class="form-control" name="username"
+									placeholder="Phone / Username / E-mail" required>
+							</div>
+							<div class="form-group">
+								<input id="password-field" type="password" class="form-control" name="pass"
+									placeholder="Password" required>
+								<span toggle="#password-field"
+									class="fa fa-fw fa-eye field-icon toggle-password"></span>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
+							</div>
+							<div class="form-group d-md-flex">
+								<div class="w-50">
+									<label class="checkbox-wrap checkbox-primary">Remember Me
+										<input type="checkbox" checked>
+										<span class="checkmark"></span>
 									</label>
 								</div>
 								<div class="w-50 text-md-right">
 									<a href="#" style="color: #fff">Forgot Password</a>
 								</div>
-	            </div>
-	          </form>
-	          <p class="w-100 text-center pt-4">&mdash; Do not have an account? &mdash;</p>
-	          <div class="social d-flex text-center">
-				<div class="col-3"></div>
-	          	<a href="{% url 'supplier_register_url' %}" class="px-2 py-2 mr-md-1 rounded"><span class="ion-logo-facebook mr-2"></span> Sign up</a>
-				<div class="col-3"></div>
-	          </div>
-		      </div>
+							</div>
+						</form>
+						<p class="w-100 text-center pt-4">&mdash; Do not have an account? &mdash;</p>
+						<div class="social d-flex text-center">
+							<div class="col-3"></div>
+							<a href="{% url 'supplier_register_url' %}" class="px-2 py-2 mr-md-1 rounded"><span
+									class="ion-logo-facebook mr-2"></span> Sign up</a>
+							<div class="col-3"></div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</section>
 
 	<script src="{% static 'js/jquery.min.js' %}"></script>
-  <script src="{% static 'js/popper.js' %}"></script>
-  <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'js/main.js' %}"></script>
+	<script src="{% static 'js/popper.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
 
-	</body>
+</body>
+
 </html>

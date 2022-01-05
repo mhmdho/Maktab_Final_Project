@@ -23,31 +23,32 @@ class SupplierLogin(View):
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
             return redirect('create_shop_url')
-
-
-        return render(request, 'myuser/supplier_login.html')
+        form = SupplierRegisterForm()
+        return render(request, 'forms/supplier_login.html', {'form': form})
     
     def post(self, request):
         user = authenticate(phone=request.POST.get('username'), password=request.POST.get('pass'))
         if user is not None:
             if user.is_supplier and user.is_active:
-                login(request, user)
-                shop = Shop.Undeleted.filter(supplier=self.request.user).first()
-                messages.success(request, "Login successfully." )
-                if shop:
-                    return redirect('shop_detail_url', slug=shop.slug)
-                return redirect('create_shop_url')
+                form = SupplierRegisterForm(request.POST)
+                if form.is_valid():
+                    login(request, user)
+                    shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+                    messages.success(request, "Login successfully." )
+                    if shop:
+                        return redirect('shop_detail_url', slug=shop.slug)
+                    return redirect('create_shop_url')
             messages.success(request, "You are not a supplier or your acount suspended." )
             return render(request, 'myuser/supplier_login.html')
 
-        messages.success(request, "Unsuccessful login. Invalid user" )
+        messages.error(request, "Unsuccessful login. Invalid user" )
         return render(request, 'myuser/supplier_login.html')
 
 
 class SupplierLogout(View):
     def get(self, request):
         logout(request)
-        messages.success(request, "logout successfully." )
+        messages.info(request, "logout successfully." )
         return render(request, 'myuser/supplier_login.html')
 
 
@@ -72,4 +73,4 @@ class SupplierRegister(CreateView):
             messages.success(request, "Registration was successful." )
             return redirect('supplier_login_url')
         messages.error(request, "Invalid Input!." )
-        return render(request, 'myuser/supplier_login.html')
+        return redirect('supplier_register_url')

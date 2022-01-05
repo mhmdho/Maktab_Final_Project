@@ -699,7 +699,6 @@
                                 <p class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
                                     {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
                                     {{ message }}
-                                    {{ message.tags }}
                                 </p>
                                 {% endfor %}
                             </ul>

@@ -26,7 +26,7 @@ class Order(models.Model):
     is_payment = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['created_at',]
+        ordering = ['-created_at',]
     
     # def total_price(self):
     #     pass
