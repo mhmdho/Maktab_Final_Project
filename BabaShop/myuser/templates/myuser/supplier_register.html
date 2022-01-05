@@ -1,0 +1,75 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>BabaShop | Register</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+	</head>
+	<body class="img js-fullheight" style="background-image: url({% static 'images/bgr.jpg' %})">
+	<section class="ftco-section pb-0 pt-0">
+		<div class="container">
+
+			
+			<div class="row justify-content-center">
+				<div class="col-md-7 col-lg-7"></div>
+				<div class="col-md-5 col-lg-5">
+					<div class="login-wrap p-0 pt-5">
+		      	<h3 class="mb-4 text-center">Register</h3>
+				
+				<!-- <form action="#" class="signin-form"> -->
+				<form action='{% url "supplier_register_url" %}' method="post">
+					{% csrf_token %}
+
+					<div class="form-group">
+					  <input type="phone" class="form-control" name="phone" placeholder="phone" required>
+				  	</div>
+		      		<div class="form-group">
+		      			<input type="text" class="form-control" name="username" placeholder="Username" required>
+		      		</div>
+					<div class="form-group">
+						<input type="phone" class="form-control" name="email" placeholder="email" required>
+					</div>
+
+					<div class="form-group">
+						<input id="password-field" type="password" class="form-control" name="pass1" placeholder="Password" required>
+						<span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+					</div>
+					<div class="form-group">
+						<input id="password-field" type="password" class="form-control" name="pass2" placeholder="Confirm Password" required>
+						<span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+					</div>
+
+					<div class="form-group">
+						<button type="submit" class="form-control btn btn-primary submit px-3" style="background: #fbceb5d1 !important;" >Sign Up</button>
+					</div>
+
+
+	          	</form>
+	          <p class="w-100 text-center pt-4">&mdash; Have an account? &mdash;</p>
+	          <div class="social d-flex text-center">
+				<div class="col-3"></div>
+	          	<a href="{% url 'supplier_login_url' %}" class="px-2 py-2 mr-md-1 rounded"><span class="ion-logo-facebook mr-2"></span> Sign In</a>
+				<div class="col-3"></div>
+	          </div>
+		      </div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/popper.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+
+	</body>
+</html>

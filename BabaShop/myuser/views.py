@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 
 from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic.base import TemplateView
 
 from shop.models import Shop
 
@@ -36,3 +37,7 @@ class SupplierLogout(View):
     def get(self, request):
         logout(request)
         return render(request, 'myuser/supplier_login.html')
+
+
+class SupplierRegister(TemplateView):
+    template_name = 'myuser/supplier_register.html'
