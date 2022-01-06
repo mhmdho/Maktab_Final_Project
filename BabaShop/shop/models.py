@@ -115,8 +115,8 @@ class Image(models.Model):
         if not main_img:
             self.default = True
         else:
-            main_img = self.product.product_img.all()[0]
-            main_img.update(default=True)
+            main_img = self.product.product_img.all().first()
+            main_img.default=True
         return super().save(*args, **kwargs)
     
     def __str__(self):

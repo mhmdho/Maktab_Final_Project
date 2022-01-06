@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
+from shop.models import Image
 from shop.forms import AddImageForm
 
 from shop.models import Shop, Product
@@ -115,23 +116,17 @@ class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         return context
 
-    # def form_valid(self, form):
-    #     obj = form.save(commit=False)
-    #     obj.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
-    #     return super(CreateProduct, self).form_valid(form)
-
     def post(self, request, *args, **kwargs):
         form = CreateProductForm(request.POST, request.FILES)
-
-        form_img = AddImageForm(request.POST)
-        
         form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
-
         if form.is_valid():
             form.save()
-            form_img.save()
+            for i in range(1,5):
+                if form.cleaned_data[f'image{i}'] is not None:
+                    Image.objects.create(image=form.cleaned_data[f'image{i}'], product=form.instance)
+            
+            messages.success(request, "New product created." )
             return redirect("shop_detail_url", self.kwargs["slug"])
 
-        # return redirect("shop_detail_url", self.kwargs["slug"])
-        # return HttpResponse("shop_detail_url")
-
+        messages.info(request, "You must input all fields." )
+        return redirect("create_product_url", self.kwargs["slug"])

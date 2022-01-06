@@ -1,24 +1,28 @@
 {% extends "dashboard.html" %}
 
 
-{% block content %}            
+{% block content %}
 
 <div class="tab-content">
 
     <div class="tab-pane tabs-animation fade show active" id="tab-content-1" role="tabpanel">
         <div class="main-card mb-3 card">
-            <div class="card-body"><h5 class="card-title mb-5">New Product</h5>
-                <form enctype="multipart/form-data" action='{% url "create_product_url" slug=request.resolver_match.kwargs.slug %}' method="post" class="">
+            <div class="card-body">
+                <h5 class="card-title mb-5">New Product</h5>
+                <form enctype="multipart/form-data"
+                    action='{% url "create_product_url" slug=request.resolver_match.kwargs.slug %}' method="post"
+                    class="">
                     {% csrf_token %}
 
-                    <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Name</label>
+                    <div class="position-relative row form-group"><label for="exampleText"
+                            class="col-sm-2 col-form-label">Name</label>
                         <div class="col-sm-10">
                             {{ form.name }}
                         </div>
                     </div>
 
                     <div class="position-relative row form-group">
-                        
+
                         <label for="exampleNumber" class="col-sm-2 col-form-label">Price</label>
                         <div class="col-sm-4">
                             {{ form.price }}
@@ -32,7 +36,7 @@
                     </div>
 
                     <div class="position-relative row form-group">
-                        
+
                         <label for="exampleNumber" class="col-sm-2 col-form-label">Stock</label>
                         <div class="col-sm-4">
                             {{ form.stock }}
@@ -44,45 +48,53 @@
                         </div>
 
                     </div>
-                    
-                    <div class="position-relative row form-group"><label for="exampleText" class="col-sm-2 col-form-label">Description</label>
+
+                    <div class="position-relative row form-group"><label for="exampleText"
+                            class="col-sm-2 col-form-label">Description</label>
                         <div class="col-sm-10">
                             {{ form.description }}
                         </div>
                     </div>
 
-                    <div class="position-relative row form-group"><label for="exampleSelect" class="col-sm-2 col-form-label">Category</label>
+                    <div class="position-relative row form-group"><label for="exampleSelect"
+                            class="col-sm-2 col-form-label">Category</label>
                         <div class="col-sm-10">
                             {{ form.category }}
                         </div>
                     </div>
-                    <div class="position-relative row form-group"><label for="exampleSelectMulti" class="col-sm-2 col-form-label">Tag</label>
+                    <div class="position-relative row form-group"><label for="exampleSelectMulti"
+                            class="col-sm-2 col-form-label">Tag</label>
                         <div class="col-sm-10">
                             {{ form.tag }}
                         </div>
                     </div>
 
-                    
-                    <div class="position-relative row form-group"><label for="exampleFile" class="col-sm-2 col-form-label">Image</label>
-                        <div class="col-sm-10">
 
-                            <small class="form-text text-muted">This is your product image. It helps to sell your product more better.</small>
+                    <div class="position-relative row form-group pt-4"><label for="exampleFile"
+                            class="col-sm-2 col-form-label">Image</label>
+                        <div class="col-sm-10">
+                            {{ form.image1 }}
+                            <small class="form-text text-muted pb-3">This is your product image. It helps to sell your
+                                product more better. Atleast one image is required.</small>
+                            {{ form.image2 }} {{ form.image3 }} {{ form.image4 }}
                         </div>
                     </div>
 
-                    <div class="position-relative row form-group"><label for="checkbox2" class="col-sm-2 col-form-label">Active</label>
+                    <div class="position-relative row form-group pt-4"><label for="checkbox2"
+                            class="col-sm-2 col-form-label">Active</label>
                         <div class="col-sm-10">
-                            <div class="position-relative form-check"><label class="form-check-label">
-                                {{ form.is_active }}
-                                Available In Stock</label></div>
+                            <div class="position-relative form-check pt-1"><label class="form-check-label">
+                                    {{ form.is_active }}
+                                    Available In Stock</label></div>
                         </div>
                     </div>
                     <br>
-            
+
                     <div class="position-relative row form-check">
                         <div class="col-sm-10 offset-sm-2 px-0">
                             <button class="btn btn-secondary">Create</button>
-                            <a href='{% url "shop_detail_url" slug=request.resolver_match.kwargs.slug %}' class="btn btn-danger mx-3">Cancel</a>
+                            <a href='{% url "shop_detail_url" slug=request.resolver_match.kwargs.slug %}'
+                                class="btn btn-danger mx-3">Cancel</a>
                         </div>
                     </div>
 
@@ -93,6 +105,4 @@
 
 </div>
 
-{% endblock content %}            
-
-                        
+{% endblock content %}

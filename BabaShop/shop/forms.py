@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import ModelForm, Textarea, TextInput
 from django.forms.widgets import CheckboxInput, ClearableFileInput, NumberInput, RadioSelect, Select, SelectMultiple
 from .models import Image, Product, Shop
@@ -18,6 +19,10 @@ class CreateShopForm(ModelForm):
 
 
 class CreateProductForm(ModelForm):
+    image1 = forms.ImageField(required=True)
+    image2 = forms.ImageField(required=False)
+    image3 = forms.ImageField(required=False)
+    image4 = forms.ImageField(required=False)
     class Meta:
         model = Product
         exclude = ['slug', 'created_at', 'updated_at', 'shop', 'is_confirmed']

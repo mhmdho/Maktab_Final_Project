@@ -708,16 +708,14 @@
                         {% endif %}
 
                         {% if messages %}
-                        <div class="justify-content-center p-0 m-0">
-                            <ul class="messages justify-content-center p-0 m-0">
+                            <div class="messages text-center p-0 m-0">
                                 {% for message in messages %}
-                                <p class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
+                                <b class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
                                     {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
                                     {{ message }}
-                                </p>
+                                </b>
                                 {% endfor %}
-                            </ul>
-                        </div>
+                            </div>
                         {% endif %}
 
                     </div>
