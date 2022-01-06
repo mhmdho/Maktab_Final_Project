@@ -4,48 +4,6 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-md-6 col-xl-4">
-        <div class="card mb-3 widget-content bg-midnight-bloom">
-            <div class="widget-content-wrapper text-white">
-                <div class="widget-content-left">
-                    <div class="widget-heading">Total Orders</div>
-                    <div class="widget-subheading">{{ shop.name }} shop total orders</div>
-                </div>
-                <div class="widget-content-right">
-                    <div class="widget-numbers text-white"><span>{{ order_count }}</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card mb-3 widget-content bg-arielle-smile">
-            <div class="widget-content-wrapper text-white">
-                <div class="widget-content-left">
-                    <div class="widget-heading">Customers</div>
-                    <div class="widget-subheading">{{ shop.name }} shop total customers</div>
-                </div>
-                <div class="widget-content-right">
-                    <div class="widget-numbers text-white"><span>{{ customer_count }}</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card mb-3 widget-content bg-grow-early">
-            <div class="widget-content-wrapper text-white">
-                <div class="widget-content-left">
-                    <div class="widget-heading">Orsers Value</div>
-                    <div class="widget-subheading">Total orders value</div>
-                </div>
-                <div class="widget-content-right">
-                    <div class="widget-numbers text-white"><span>{{ orders_value }}$</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-md-12">
         <div class="main-card mb-3 card">
             <div class="card-header">{{ shop.name }} Orders
@@ -104,20 +62,20 @@
                             <td class="text-center">{{ order.updated_at }}</td>
                             <td class="text-center">
                                 {% if order.is_payment %}
-                                <div class="badge badge-success w-75"><i class="fa fa-check"></i>
+                                <div class="text-success w-75"><i class="fa fa-check"></i>
                                 </div>
                                 {% else %}
-                                <div class="badge badge-danger w-75"><i class="fa fa-times"> </i>
+                                <div class="text-danger w-75"><i class="fa fa-times"> </i>
                                 </div>
                                 {% endif %}
                             </td>
                             <td class="text-center">
                                 {% if order.status == 'CONFIRMED' %}
-                                <div class="badge badge-success w-100">{{ order.status }}</div>
+                                <div class="badge badge-success w-100 btn">{{ order.status }}</div>
                                 {% elif order.status == 'CHECKING' %}
-                                <div class="badge badge-warning w-100">{{ order.status }}...</div>
+                                <div class="badge badge-warning w-100 btn">{{ order.status }}...</div>
                                 {% else %}
-                                <div class="badge badge-danger w-100">{{ order.status }}</div>
+                                <div class="badge badge-danger w-100 btn">{{ order.status }}</div>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -131,8 +89,9 @@
                 </table>
             </div>
             <div class="d-block text-center card-footer">
-                <a href="{% url 'create_product_url' slug=shop.slug %}" class="btn-wide btn btn-outline-success">Add
-                    New</a>
+                <a href="{% url 'create_product_url' slug=shop.slug %}" class="btn-wide btn btn-outline-warning">
+                    Save
+                </a>
             </div>
         </div>
     </div>
