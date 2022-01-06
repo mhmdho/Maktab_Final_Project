@@ -37,7 +37,7 @@
                     </thead>
                     <tbody>
 
-                        {% for order in order_list %}
+                        {% for order in filter.qs %}
                         <tr>
                             <td class="text-center text-muted">#{{ order.id }}</td>
                             <td>
@@ -75,12 +75,20 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
+
+                                <select name="status" id="id_status" {% if order.status == 'CANCELED' %} disabled {% endif %}>
+                                    <option value="CONFIRMED" {% if order.status == 'CONFIRMED' %} selected="" {% endif %}>CONFIRMED</option>
+                                    <option value="CHECKING" {% if order.status == 'CHECKING' %} selected="" {% endif %}>CHECKING</option>
+                                    <option value="" {% if  not order.status %} selected ="" {% endif %}disabled>---------</option>
+                                <input  hidden value={{order.product.SHOP.slug}} name = "slug">
+                                <input class="btn btn-success btn-icon-split" type="submit" value= 'Save' >
+
                                 {% if order.status == 'CONFIRMED' %}
-                                <div class="badge badge-success w-100 btn">{{ order.status }}</div>
+                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-success w-100 btn">{{ order.status }}</div>
                                 {% elif order.status == 'CHECKING' %}
-                                <div class="badge badge-warning w-100 btn">{{ order.status }}...</div>
+                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-warning w-100 btn">{{ order.status }}...</div>
                                 {% else %}
-                                <div class="badge badge-danger w-100 btn">{{ order.status }}</div>
+                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-danger w-100 btn">{{ order.status }}</div>
                                 {% endif %}
                             </td>
                             <td class="text-center">
