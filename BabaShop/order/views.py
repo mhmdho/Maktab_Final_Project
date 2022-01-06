@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.db.models.aggregates import Count
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from shop.models import Image
+from order.models import OrderItem
 
 from shop.models import Shop, Product
 from order.models import Order
@@ -34,4 +36,24 @@ class OrderList(LoginRequiredMixin, DetailView):
         for ord in context['order_list']:
             orders_value += ord.total_price
         context['orders_value'] = orders_value
+        return context
+
+
+class OrderDetail(LoginRequiredMixin, DetailView):
+    template_name = 'order/order_detail.html'
+    login_url = '/myuser/supplier_login/'
+    model = Order
+
+    def get_queryset(self, *arg, **kwargs):
+        return Shop.Undeleted.filter(slug=self.kwargs['slug'], supplier=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+
+        context['order_list'] = Order.objects.filter(id=self.kwargs['id'], orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
+        context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'], product__shop__slug=self.kwargs['slug'])
+        # context['orderitem_img'] = .objects.filter(product__orderitem_id=self.kwargs['id'], default=True)
+        
+ 
         return context
