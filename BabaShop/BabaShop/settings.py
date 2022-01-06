@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import environ
 import os
+from django.contrib import messages
+
 
 env = environ.Env()
 environ.Env.read_env()
@@ -65,7 +67,7 @@ ROOT_URLCONF = 'BabaShop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -143,3 +145,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.INFO: 'warning',
+ }
+
+AUTHENTICATION_BACKENDS = [
+    'myuser.backends.AuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

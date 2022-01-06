@@ -5,36 +5,75 @@ from django.utils.html import format_html
 
 # Register your models here.
 
-admin.site.register(ProductCategory)
-admin.site.register(ProductTag)
-admin.site.register(Image)
+class ProductCagetoryAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+    # list_editable = ('title',)
+
+admin.site.register(ProductCategory, ProductCagetoryAdmin)
+
+
+class ProductTagAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    list_display = ('title',)
+    list_display_link = ('title',)
+    # list_editable = ('title',)
+
+admin.site.register(ProductTag, ProductTagAdmin)
+
+
+class ImageAdmin(admin.ModelAdmin):
+    search_fields = ('product',)
+    list_filter = ('default',)
+    list_display = ('product', 'image', 'default', 'show_image')
+
+    @admin.display(empty_value='-', description="show image")
+    def show_image(self, obj):
+        if (obj):
+            return format_html(
+                '<img src="{}" width=50 height=50/>',
+                obj,   
+            )
+        return '-'
+admin.site.register(Image, ImageAdmin)
 
 
 class ShopAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('type', 'is_confirmed', 'is_deleted')
-    list_display = ('name', 'type', 'address', 'supplier', 'is_confirmed')
+    list_display = ('name', 'type', 'address', 'supplier', 'is_confirmed', 'is_deleted')
     
     @admin.action(description='Select shops to confirmed')
     def publish_shop(modeladmin, request, queryset):
         queryset.update(is_confirmed=True)
 
     actions = [publish_shop]
-    list_editable = ('is_confirmed',)
+    list_editable = ('is_confirmed', 'is_deleted')
 
+    fieldsets = (
+    (None, {
+        'fields': (('name', 'type'), 'address', ('supplier', 'is_confirmed'))
+    }),
+
+    ('more options', {
+        'classes': ('collapse', ),
+        'fields':  ('is_deleted', 'slug'),
+    }),
+)
 
 admin.site.register(Shop, ShopAdmin)
 
 
 class ImageInline(admin.TabularInline):
     model = Image
-    extra = 0
+    extra = 1
 
 
 class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'descrption')
     list_filter = ('category', 'tag', 'shop', 'is_confirmed')
-    list_display = ('name', 'price', 'stock', 'shop', 'is_confirmed', 'show_image')
+    list_display = ('name', 'price', 'stock', 'discount', 'shop', 'is_confirmed', 'show_image')
     date_hierarchy = ('created_at')
 
     @admin.display(empty_value='-',description="show image")
@@ -48,7 +87,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {
-            'fields': (('name', 'price'), 'description', ('shop', 'category'), 'tag', ('stock', 'weight'))
+            'fields': (('name', 'price'), 'description', ('shop', 'category'), 'tag', ('stock', 'weight'), 'discount')
         }),
 
         ('more options', {

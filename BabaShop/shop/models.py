@@ -1,8 +1,11 @@
+from typing_extensions import Required
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField
 from .managers import UndeletedShop, DeletedShop
 from myuser.models import CustomUser
+from django.template.defaultfilters import slugify
+import random
 
 # Create your models here.
 
@@ -23,10 +26,11 @@ class Shop(models.Model):
         (ORG, "Organic store"),
         (CON, "Convenience store"),
     )
+    slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = CharField(max_length=50)
     type = models.CharField(max_length=17, choices=TYPE_CHOICES, default=SUP)
     address = CharField(max_length=200)
-    supplier = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    supplier = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_confirmed = BooleanField(default=False)
     is_deleted = BooleanField(default=False)
 
@@ -36,12 +40,31 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def random_number_generator(self):
+        return '_' + str(random.randint(1000, 9999))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name) + '_' + str.lower(self.type).replace(" ","_")
+            while Shop.objects.filter(slug = self.slug):
+                self.slug = slugify(self.name)
+                self.slug += self.random_number_generator()
+        return super().save(*args, **kwargs)
+    
+    def get_image(self):
+        return self.product_img.get(default=True).image.url
+
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
+    slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
-    stock = models.IntegerField(default=0)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
+    stock = models.IntegerField(default=0, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -49,7 +72,8 @@ class Product(models.Model):
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE) 
     tag = models.ManyToManyField('ProductTag', blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
-    # image = models.ImageField(upload_to='product_image/')
+    # image = models.FileField(upload_to='product_image/')
+    # image = models.ForeignKey("Image", Required=True)
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
@@ -61,6 +85,17 @@ class Product(models.Model):
     class Meta:
         ordering = ['-id']
 
+    def random_number_generator(self):
+        return '_' + str(random.randint(1000, 9999))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            while Product.objects.filter(slug = self.slug):
+                self.slug = slugify(self.name)
+                self.slug += self.random_number_generator()
+        return super().save(*args, **kwargs)
+    
     def get_image(self):
         return self.product_img.get(default=True).image.url
 
@@ -73,6 +108,17 @@ class Image(models.Model):
     image = models.ImageField(upload_to='product_image/')
     default = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        main_img = self.product.product_img.filter(default=True)
+        if self.default:
+            main_img.update(default=False)
+        if not main_img:
+            self.default = True
+        else:
+            main_img = self.product.product_img.all().first()
+            main_img.default=True
+        return super().save(*args, **kwargs)
+    
     def __str__(self):
         return self.image.url
 
