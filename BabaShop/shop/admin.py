@@ -49,7 +49,7 @@ class ShopAdmin(admin.ModelAdmin):
         queryset.update(is_confirmed=True)
 
     actions = [publish_shop]
-    list_editable = ('is_confirmed',)
+    list_editable = ('is_confirmed', 'is_deleted')
 
     fieldsets = (
     (None, {

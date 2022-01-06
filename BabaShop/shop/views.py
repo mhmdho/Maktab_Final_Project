@@ -45,7 +45,7 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         return context
 
 
-class CreateShop(LoginRequiredMixin, View):
+class CreateShop(LoginRequiredMixin, CreateView, ContextMixin):
     template_name = 'forms/create_shop.html'
     login_url = '/myuser/supplier_login/'
     form_class = CreateShopForm
@@ -53,25 +53,23 @@ class CreateShop(LoginRequiredMixin, View):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-
-    def get(self, request):
-        form = CreateShopForm()
-        return render(request, 'forms/create_shop.html',{'form': form})
-
+        return context
+    
     def post(self, request):
-        not_confirmed = Shop.Undeleted.filter(is_confirmed=False ,supplier=request.user).first().slug
+        not_confirmed = Shop.Undeleted.filter(is_confirmed=False ,supplier=request.user).first()
         if not_confirmed:
             messages.error(request, "You have unconfirmed shop." )
-            return redirect('shop_detail_url', slug=not_confirmed)
+            return redirect('shop_detail_url', slug=not_confirmed.slug)
         form = CreateShopForm(request.POST)
         if form.is_valid():
             form.instance.supplier = request.user
             print(form)
             form.save()
-            return redirect('shop_detail_url')
+            shop = Shop.Undeleted.filter(supplier=request.user).last()
+            return redirect('shop_detail_url', shop.slug)
     
 
-class EditShop(LoginRequiredMixin,UpdateView, ContextMixin):
+class EditShop(LoginRequiredMixin,UpdateView):
     template_name = 'shop/edit_shop.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -87,9 +85,10 @@ class EditShop(LoginRequiredMixin,UpdateView, ContextMixin):
         return reverse("shop_detail_url", kwargs={"slug": slug})
 
     def post(self, request, *args, **kwargs):
-        shop = (Shop.Undeleted.filter(slug=self.kwargs['slug']))
+        shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
         shop.update(is_confirmed = False)
-        return redirect("shop_detail_url", self.kwargs["slug"])
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
 
 
 class DeleteShop(LoginRequiredMixin,UpdateView):
@@ -99,17 +98,22 @@ class DeleteShop(LoginRequiredMixin,UpdateView):
     def get(self, request, *args, **kwargs):
         shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
         shop.update(is_deleted=True, is_confirmed=True)
-        shop = Shop.Undeleted.filter(supplier=self.request.user)
+        shop = Shop.Undeleted.filter(supplier=self.request.user).first()
         messages.info(request, "You deleted the shop." )
         if shop:
             return redirect('shop_detail_url', slug=shop.slug)
         return redirect('create_shop_url')
 
 
-class CreateProduct(LoginRequiredMixin, CreateView):
+class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
     template_name = 'forms/create_product.html'
     login_url = '/myuser/supplier_login/'
     form_class = CreateProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        return context
 
     # def form_valid(self, form):
     #     obj = form.save(commit=False)

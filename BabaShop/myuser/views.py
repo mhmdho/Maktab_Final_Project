@@ -20,7 +20,7 @@ class SupplierLogin(LoginView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            messages.success(request, "Your are loged in before." )
+            # messages.success(request, "Your are loged in before." )
             shop = Shop.Undeleted.filter(supplier=self.request.user).first()
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
