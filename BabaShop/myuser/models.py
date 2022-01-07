@@ -29,9 +29,16 @@ class CustomUser(AbstractUser):
         help_text=_('Designates whether the user can log as a supplier.'),
     )
 
-    USERNAME_FIELD = 'phone' or 'email' or 'username'
-    REQUIRED_FIELDS = ['email', 'username']
-
+    if email:
+        USERNAME_FIELD = 'email'
+        REQUIRED_FIELDS = [ 'username', 'phone']
+    elif phone:
+        USERNAME_FIELD = 'phone'
+        REQUIRED_FIELDS = [ 'username', 'email']
+    else:
+        USERNAME_FIELD = 'username'
+        REQUIRED_FIELDS = [ 'phone', 'email']
+    
     objects = CustomUserManager()
 
     def __str__(self):

@@ -63,9 +63,17 @@ class OrderDetail(LoginRequiredMixin, DetailView):
 
 
 class OrderEditstatus(LoginRequiredMixin, View):
+    login_url = '/myuser/supplier_login/'
     model = Order
-    def post(self, request, *args, **kwargs):
-        print(request.POST['order_id'])
-        self.model.objects.filter(pk=request.POST['order_id']).update(
-        status= 'CHECKING')
-        return redirect(reverse('order_list_url', kwargs={'slug': request.POST['slug']}))
+
+    def get(self, request, *args, **kwargs):
+        obj = self.model.objects.filter(pk=self.kwargs['pk'])
+        obj = Order.objects.filter(pk=self.kwargs['pk']).first()
+        if obj.status == 'CANCELED':
+            self.model.objects.filter(pk=self.kwargs['pk']).update(status= 'CONFIRMED')
+        elif obj.status == 'CONFIRMED':
+            self.model.objects.filter(pk=self.kwargs['pk']).update(status= 'CHECKING')
+        else:
+            self.model.objects.filter(pk=self.kwargs['pk']).update(status= 'CANCELED')
+            messages.error(request, f"The order NO. {obj.id} is Canceled." )
+        return redirect('order_list_url', self.kwargs['slug'])

@@ -61,7 +61,7 @@ class SupplierRegisterForm(UserCreationForm):
 class SupplierLoginForm(Form):
     phone = forms.CharField(
         widget=forms.TextInput(attrs={
-            'placeholder': 'Phone',
+            'placeholder': "Phone or Username or Email",
             'class':'form-control',           
             'autofocus': True}))
     
