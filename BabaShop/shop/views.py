@@ -42,7 +42,10 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
+            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['orders_value'] = orders_value
+
         return context
 
 
@@ -90,6 +93,41 @@ class EditShop(LoginRequiredMixin,UpdateView):
         shop.update(is_confirmed = False)
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
+
+
+class EditProduct(LoginRequiredMixin,UpdateView):
+    template_name = 'shop/edit_product.html'
+    login_url = '/myuser/supplier_login/'
+    model = Shop
+    form_class = CreateProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        return context
+
+    def get_success_url(self):
+        slug = self.kwargs["slug"]
+        return reverse("shop_detail_url", kwargs={"slug": slug})
+
+    def post(self, request, *args, **kwargs):
+        # shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
+        # shop.update(is_confirmed = False)
+        # self.object = self.get_object()
+        # return super().post(request, *args, **kwargs)
+        form = CreateProductForm(request.POST, request.FILES)
+        form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
+        if form.is_valid():
+            form.save()
+            for i in range(1,5):
+                if form.cleaned_data[f'image{i}'] is not None:
+                    Image.objects.create(image=form.cleaned_data[f'image{i}'], product=form.instance)
+            
+            messages.success(request, "New product created." )
+            return redirect("shop_detail_url", self.kwargs["slug"])
+
+        messages.info(request, "You must input all fields." )
+        return redirect("create_product_url", self.kwargs["slug"])
 
 
 class DeleteShop(LoginRequiredMixin,UpdateView):

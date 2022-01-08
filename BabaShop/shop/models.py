@@ -53,7 +53,7 @@ class Shop(models.Model):
         return super().save(*args, **kwargs)
     
     def get_image(self):
-        return self.product_img.get(default=True).image.url
+        return self.product_img.filter(default=True)[0].image.url
 
     def __str__(self):
         return self.name
@@ -72,8 +72,6 @@ class Product(models.Model):
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE) 
     tag = models.ManyToManyField('ProductTag', blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
-    # image = models.FileField(upload_to='product_image/')
-    # image = models.ForeignKey("Image", Required=True)
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
@@ -97,7 +95,7 @@ class Product(models.Model):
         return super().save(*args, **kwargs)
     
     def get_image(self):
-        return self.product_img.get(default=True).image.url
+        return self.product_img.filter(default=True)[0].image.url
 
     def __str__(self):
         return self.name
@@ -109,7 +107,7 @@ class Image(models.Model):
     default = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        main_img = self.product.product_img.filter(default=True)
+        main_img = self.product.product_img.filter(product=True)
         if self.default:
             main_img.update(default=False)
         if not main_img:

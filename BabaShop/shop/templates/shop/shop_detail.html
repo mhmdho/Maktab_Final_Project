@@ -49,12 +49,7 @@
     <div class="col-md-12">
         <div class="main-card mb-3 card">
             <div class="card-header">{{ shop.name }} Orders
-                <div class="btn-actions-pane-right">
-                    <div role="group" class="btn-group-sm btn-group">
-                        <button class="active btn btn-focus">Last Week</button>
-                        <button class="btn btn-focus">All Month</button>
-                    </div>
-                </div>
+
             </div>
             <div class="table-responsive">
                 <table class="align-middle mb-0 table table-borderless table-striped table-hover">
@@ -97,8 +92,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center">{{ order.total_price }}</td>
-                            <td class="text-center">{{ order.total_quantity }}</td>
+                            <td class="text-center">{{ order.shop_total_price }}</td>
+                            <td class="text-center">{{ order.shop_total_quantity }}</td>
                             <td class="text-center">{{ order.discount }}</td>
                             <td class="text-center">{{ order.created_at.date }}</td>
                             <td class="text-center">{{ order.updated_at }}</td>
@@ -121,8 +116,8 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                <a href="{% url 'order_detail_url' slug=shop.slug id=order.id %}" type="button" id="PopoverCustomT-1"
-                                    class="btn btn-primary btn-sm">Details</a>
+                                <a href="{% url 'order_detail_url' slug=shop.slug id=order.id %}" type="button"
+                                    id="PopoverCustomT-1" class="btn btn-primary btn-sm">Details</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -196,12 +191,7 @@
     <div class="col-md-12">
         <div class="main-card mb-3 card">
             <div class="card-header">{{ shop.name }} Products
-                <div class="btn-actions-pane-right">
-                    <div role="group" class="btn-group-sm btn-group">
-                        <button class="active btn btn-focus">Last Week</button>
-                        <button class="btn btn-focus">All Month</button>
-                    </div>
-                </div>
+
             </div>
             <div class="table-responsive">
                 <table class="align-middle mb-0 table table-borderless table-striped table-hover">

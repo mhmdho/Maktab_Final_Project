@@ -576,15 +576,17 @@
                                     Back
                                 </a>
                                 {% endif %}
-                                </li>
+                            </li>
 
                             {% if shop.slug %}
                             <li class="app-sidebar__heading">Lists</li>
                             <li>
+                                {% if shop.slug %}
                                 <a href="{% url 'order_list_url' slug=shop.slug %}">
                                     <i class="metismenu-icon pe-7s-pen"></i>
                                     Orders list
                                 </a>
+                                {% endif %}
                             </li>
                             <li>
                                 <a href="dashboard-boxes.html">
@@ -621,13 +623,11 @@
                                     title="Edit Shop" data-placement="bottom" class="btn-shadow mr-3 btn btn-secondary">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                {% if shop.is_confirmed %}
                                 <a href="{% url 'delete_shop_url' slug=shop.slug %}" type="button" data-toggle="tooltip"
                                     title="Delete Shop" data-placement="bottom"
                                     class="btn-shadow mr-3 btn btn-secondary">
                                     <i class="fa fa-trash"></i> </a>
                                 </a>
-                                {% endif %}
                                 <div class="d-inline-block dropdown">
                                     {% if shop.is_confirmed %}
                                     <button type="button" data-toggle="dropdown" aria-haspopup="true"
@@ -708,14 +708,14 @@
                         {% endif %}
 
                         {% if messages %}
-                            <div class="messages text-center p-0 m-0">
-                                {% for message in messages %}
-                                <b class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
-                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
-                                    {{ message }}
-                                </b>
-                                {% endfor %}
-                            </div>
+                        <div class="messages text-center p-0 m-0">
+                            {% for message in messages %}
+                            <b class="text-center {% if message.tags %}text-{{ message.tags }}{% endif %} p-0 m-0">
+                                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                                {{ message }}
+                            </b>
+                            {% endfor %}
+                        </div>
                         {% endif %}
 
                     </div>
@@ -733,9 +733,11 @@
                             <div class="app-footer-left">
                                 <ul class="nav">
                                     <li class="nav-item">
+                                        {% if shop.slug %}
                                         <a href="{% url 'order_list_url' slug=shop.slug %}" class="nav-link">
                                             Orders
                                         </a>
+                                        {% endif %}
                                     </li>
                                     <li class="nav-item">
                                         <a href="javascript:void(0);" class="nav-link">

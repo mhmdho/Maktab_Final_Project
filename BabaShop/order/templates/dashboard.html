@@ -587,7 +587,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="dashboard-boxes.html">
+                                <a href="{% url 'product_list_url' slug=shop.slug %}">
                                     <i class="metismenu-icon pe-7s-car"></i>
                                     Products list
                                 </a>
@@ -733,14 +733,16 @@
                             <div class="app-footer-left">
                                 <ul class="nav">
                                     <li class="nav-item">
+                                        {% if shop.slug %}
                                         <a href="{% url 'order_list_url' slug=shop.slug %}" class="nav-link">
                                             Orders
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="javascript:void(0);" class="nav-link">
+                                        <a href="{% url 'product_list_url' slug=shop.slug %}" class="nav-link">
                                             Products
                                         </a>
+                                        {% endif %}
                                     </li>
                                 </ul>
                             </div>

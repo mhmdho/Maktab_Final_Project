@@ -16,6 +16,7 @@ class Order(models.Model):
         (CF, "Confirmed"),
         (CA, "Canceled"),
     )
+    # shop = foreignkey?
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     total_quantity = models.IntegerField(blank=True)
@@ -28,8 +29,19 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created_at',]
     
-    # def total_price(self):
-    #     pass
+    def shop_order_total_price(self, slug):
+        self.shop_total_price = 0
+        order_items = self.orderitem_set.filter(product__shop__slug=slug)
+        for item in order_items:
+            self.shop_total_price += item.total_item_price
+        return self.shop_total_price
+    
+    def shop_order_total_quantity(self, slug):
+        self.shop_total_quantity = 0
+        order_items = self.orderitem_set.filter(product__shop__slug=slug)
+        for item in order_items:
+            self.shop_total_quantity += item.quantity
+        return self.shop_total_quantity
 
     def save(self, *args, **kwargs): #move to orderitem
         self.total_price = 0
