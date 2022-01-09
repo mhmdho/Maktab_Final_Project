@@ -1,14 +1,20 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-
 from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from myuser.models import CustomUser
 from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
+
+# API/DRF
+from myuser.models import CustomUser
+from rest_framework import authentication
+from rest_framework import exceptions
+from rest_framework.permissions import AllowAny
+from .serializers import RegisterSerializer
+from rest_framework import generics
 
 
 # Create your views here.
@@ -78,3 +84,24 @@ class SupplierRegister(CreateView):
             return redirect('supplier_login_url')
         messages.error(request, "Invalid Input!." )
         return redirect('supplier_register_url')
+
+
+# ----------------- API / DRF -------------------------
+
+class CostumUserAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        username = request.META.get('HTTP_X_USERNAME')
+        if not username:
+            return None
+
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such user')
+
+        return (user, None)
+
+class CustomerRegister(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
