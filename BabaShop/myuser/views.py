@@ -105,3 +105,6 @@ class CustomerRegister(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
+# from rest_framework_simplejwt.tokens import RefreshToken
+# return Response({"Success": "user successfuly registered."}, status=status.HTTP_201_CREATED, headers=headers)
