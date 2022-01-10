@@ -6,6 +6,7 @@ from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic.edit import CreateView
+from shop.filters import ShopListFilter
 from shop.models import Image
 from shop.models import Shop, Product
 from order.models import Order
@@ -175,6 +176,7 @@ class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
 # ----------------- API / DRF -------------------------
 
 class ShopListView(generics.ListAPIView):
+    filterset_class = ShopListFilter
     queryset = Shop.Undeleted.filter(is_confirmed=True)
     permission_classes = (IsAuthenticated,)
     serializer_class = ShopListSerializer
