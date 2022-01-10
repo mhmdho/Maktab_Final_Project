@@ -1,16 +1,19 @@
+from typing import ItemsView
 from django.contrib import messages
+from django.http.request import HttpHeaders
 from django.shortcuts import redirect, render
 from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
+from rest_framework.response import Response
 from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
 
 # API/DRF
 from myuser.models import CustomUser
-from rest_framework import authentication
+from rest_framework import authentication, status
 from rest_framework import exceptions
 from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer
@@ -101,10 +104,12 @@ class CostumUserAuthentication(authentication.BaseAuthentication):
 
         return (user, None)
 
+from rest_framework_simplejwt.tokens import RefreshToken
 class CustomerRegister(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
-# from rest_framework_simplejwt.tokens import RefreshToken
-# return Response({"Success": "user successfuly registered."}, status=status.HTTP_201_CREATED, headers=headers)
+    def post(self, request, *args, **kwargs):
+        self.create(request, *args, **kwargs)
+        return Response({"Success": "Your registration was successful"}, status=status.HTTP_201_CREATED)

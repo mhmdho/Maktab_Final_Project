@@ -24,6 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             phone=validated_data['phone'],
+            is_customer=True,
         )
 
         user.set_password(validated_data['password'])
