@@ -1,10 +1,7 @@
-from typing import ItemsView
 from django.contrib import messages
-from django.http.request import HttpHeaders
-from django.shortcuts import redirect, render
-from django.views.generic import View
+from django.contrib.auth import views
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from rest_framework.response import Response
 from shop.models import Shop
@@ -13,11 +10,11 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 # API/DRF
 from myuser.models import CustomUser
-from rest_framework import authentication, status
-from rest_framework import exceptions
-from rest_framework.permissions import AllowAny
-from .serializers import RegisterSerializer
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .serializers import CustomerProfileSerializer, RegisterSerializer
 from rest_framework import generics
+from rest_framework import mixins, views
 
 
 # Create your views here.
@@ -122,3 +119,11 @@ class CustomerRegister(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         self.create(request, *args, **kwargs)
         return Response({"Success": "Your registration was successful"}, status=status.HTTP_201_CREATED)
+
+
+class CustomerProfileView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CustomerProfileSerializer
+
+    def get_object(self):
+        return get_object_or_404(CustomUser, id=self.request.user.id)

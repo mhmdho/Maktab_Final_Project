@@ -61,7 +61,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
     discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
-    quantity = models.IntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 

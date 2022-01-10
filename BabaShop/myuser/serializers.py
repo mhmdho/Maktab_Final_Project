@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
+from BabaShop.shop.models import Shop
 from myuser.models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -41,3 +42,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('phone', 'email', 'username', 'image', 'first_name', 'last_name')

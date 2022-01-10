@@ -64,7 +64,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
     discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
-    stock = models.IntegerField(default=0, blank=True)
+    stock = models.PositiveIntegerField(default=0, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
