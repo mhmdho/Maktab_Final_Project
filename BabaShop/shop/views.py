@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count
-from django.shortcuts import redirect
+from django.http import request
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView, UpdateView
 from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,7 +15,7 @@ from shop.forms import CreateShopForm, CreateProductForm
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ShopListSerializer, ShopTypesSerializer
+from .serializers import ShopListSerializer, ShopProductsSerializer, ShopTypesSerializer
 from rest_framework import generics
 
 
@@ -182,7 +183,15 @@ class ShopListView(generics.ListAPIView):
     serializer_class = ShopListSerializer
 
 
-class ShoptypesView(generics.ListAPIView):
+class ShopTypesView(generics.ListAPIView):
     queryset = Shop.Undeleted.distinct('type')
     permission_classes = (IsAuthenticated,)
     serializer_class = ShopTypesSerializer
+
+
+class ShopProductsView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ShopProductsSerializer
+
+    def get_object(self):
+        return get_object_or_404(Shop, slug=self.kwargs['slug'], is_confirmed=True)

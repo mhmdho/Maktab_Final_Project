@@ -72,7 +72,7 @@ class Product(models.Model):
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE) 
     tag = models.ManyToManyField('ProductTag', blank=True)
     # like = models.IntegerField(default=0, null=True, blank=True)
-    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE, related_name='shop_products')
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
 
