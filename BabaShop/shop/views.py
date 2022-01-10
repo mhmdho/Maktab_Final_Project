@@ -14,7 +14,7 @@ from shop.forms import CreateShopForm, CreateProductForm
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ShopListSerializer
+from .serializers import ShopListSerializer, ShopTypesSerializer
 from rest_framework import generics
 
 
@@ -180,3 +180,9 @@ class ShopListView(generics.ListAPIView):
     queryset = Shop.Undeleted.filter(is_confirmed=True)
     permission_classes = (IsAuthenticated,)
     serializer_class = ShopListSerializer
+
+
+class ShoptypesView(generics.ListAPIView):
+    queryset = Shop.Undeleted.distinct('type')
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ShopTypesSerializer
