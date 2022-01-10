@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from BabaShop.shop.models import Shop
 from myuser.models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 

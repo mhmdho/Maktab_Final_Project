@@ -1,19 +1,21 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.generic import DetailView, UpdateView
-from django.views.generic.base import ContextMixin, TemplateView, View
+from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
 from shop.models import Image
-from shop.forms import AddImageForm
-
 from shop.models import Shop, Product
 from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
+
+# API/DRF
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ShopListSerializer
+from rest_framework import generics
+
 
 # Create your views here.
 
@@ -168,3 +170,11 @@ class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
 
         messages.info(request, "You must input all fields." )
         return redirect("create_product_url", self.kwargs["slug"])
+
+
+# ----------------- API / DRF -------------------------
+
+class ShopListView(generics.ListAPIView):
+    queryset = Shop.Undeleted.filter(is_confirmed=True)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ShopListSerializer

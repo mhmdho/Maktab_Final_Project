@@ -7,8 +7,6 @@ from django.views.generic.base import View
 from order.Filters import OrderFilter
 from order.models import OrderItem
 from django.shortcuts import redirect
-from django.urls.base import reverse
-
 from shop.models import Shop, Product
 from order.models import Order
 

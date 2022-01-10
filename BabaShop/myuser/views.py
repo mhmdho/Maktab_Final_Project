@@ -14,8 +14,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import CustomerProfileSerializer, RegisterSerializer
 from rest_framework import generics
-from rest_framework import mixins, views
-
+from .serializers import MyTokenObtainPairSerializer
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 # Create your views here.
 
@@ -87,10 +88,6 @@ class SupplierRegister(CreateView):
 
 
 # ----------------- API / DRF -------------------------
-from .serializers import MyTokenObtainPairSerializer
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
