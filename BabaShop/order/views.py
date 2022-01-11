@@ -7,14 +7,14 @@ from django.views.generic.base import View
 from rest_framework.response import Response
 from order.Filters import OrderFilter
 from order.models import OrderItem
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from shop.models import Shop, Product
 from order.models import Order
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderSerializer
-from rest_framework import generics, status
+from .serializers import OrderItemSerializer, OrderSerializer
+from rest_framework import generics, status, viewsets
 
 
 # Create your views here.
@@ -154,18 +154,56 @@ class OrderEditstatus(LoginRequiredMixin, View):
 
 # ----------------- API / DRF -------------------------
 
-class CreateOrderView(generics.CreateAPIView):
-    model = Order
+class CreateOrderView(generics.ListCreateAPIView, generics.DestroyAPIView):
+    model = OrderItem
     permission_classes = (IsAuthenticated,)
-    serializer_class = OrderSerializer
-    
+    serializer_class = OrderItemSerializer
+
+    def get_queryset(self, *arg, **kwargs):
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        return OrderItem.objects.filter(order=order)
+
     def create(self, request, *args, **kwargs):
-        request.data['customer'] = self.request.user.id
-        print(request.data,'dafs-----------------------')
-        # request.data['orderitem__order'] = self.id
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        try:
+            order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        except:
+            order = Order.objects.create(shop=shop, customer=self.request.user)
         
+        request.data['order'] = order.id
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class DeleteOrderView(generics.DestroyAPIView):
+    model = OrderItem
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderItemSerializer
+
+    def get_queryset(self, *arg, **kwargs):
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        return OrderItem.objects.filter(order=order)
+
+
+class PayOrderView(generics.UpdateAPIView):
+    model = Order
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderSerializer
+
+    def get_queryset(self, *arg, **kwargs):
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        return order
+    
+    def put(self, request, *args, **kwargs):
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        order = Order.objects.filter(shop=shop, customer=self.request.user, is_payment=False)
+        if order.first()['id'] == self.kwargs['pk']:
+            order.update(is_payment=True)
+            return Response({'success': 'payment done'}, status=status.HTTP_202_ACCEPTED)
+        return Response({'error:incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)

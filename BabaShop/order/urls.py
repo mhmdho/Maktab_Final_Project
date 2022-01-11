@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateOrderView, OrderEditstatus, OrderList, ProductList, OrderDetail
+from .views import CreateOrderView, DeleteOrderView, OrderEditstatus, OrderList, PayOrderView, ProductList, OrderDetail
 
 
 urlpatterns = [
@@ -9,5 +9,8 @@ urlpatterns = [
     path('order_eidt_status/<slug:slug>/<int:pk>/', OrderEditstatus.as_view(), name='order_status_url'),
 
     # API/DRF
-    path('api/create_order/', CreateOrderView.as_view(), name='create_order_api'),
+    path('api/shop/<slug:slug>/order/', CreateOrderView.as_view(), name='create_order_api'),
+    path('api/shop/<slug:slug>/order/<int:pk>/', DeleteOrderView.as_view(), name='delete_order_api'),
+    path('api/shop/<slug:slug>/order/<int:pk>/pay/', PayOrderView.as_view(), name='pay_order_api'),
+
 ]
