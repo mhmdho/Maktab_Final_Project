@@ -1,5 +1,5 @@
 from django.db import models
-from shop.models import Product
+from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
 from myuser.models import CustomUser
 
@@ -16,7 +16,8 @@ class Order(models.Model):
         (CF, "Confirmed"),
         (CA, "Canceled"),
     )
-    # shop = foreignkey?
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    items = models.ManyToManyField(Product, through='orderitem')
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True)
     total_quantity = models.IntegerField(blank=True)
