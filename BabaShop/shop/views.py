@@ -15,7 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import ProductSerializer, ShopListSerializer, ShopTypesSerializer
 from rest_framework import generics
 from shop.filters import ShopProductsFilter, ShopListFilter
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.

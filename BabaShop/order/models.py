@@ -59,7 +59,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)], blank=True)
     discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
     quantity = models.PositiveIntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
@@ -71,6 +71,8 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         if self.discount < self.product.discount:
             self.discount = self.product.discount
+        if not self.unit_price:
+            self.unit_price = self.product.price
         self.total_item_price = self.unit_price * self.quantity * (1-self.discount)
         
         print(self.order.total_price)

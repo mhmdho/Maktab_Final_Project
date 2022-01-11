@@ -4,11 +4,18 @@ from django.db.models.query import QuerySet
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
+from rest_framework.response import Response
 from order.Filters import OrderFilter
 from order.models import OrderItem
 from django.shortcuts import redirect
 from shop.models import Shop, Product
 from order.models import Order
+
+# API/DRF
+from rest_framework.permissions import IsAuthenticated
+from .serializers import OrderSerializer
+from rest_framework import generics, status
+
 
 # Create your views here.
 
@@ -143,3 +150,22 @@ class OrderEditstatus(LoginRequiredMixin, View):
             self.model.objects.filter(pk=self.kwargs['pk']).update(status= 'CONFIRMED')
             messages.error(request, f"The order NO. {obj.id} is Canceled." )
         return redirect('order_list_url', self.kwargs['slug'])
+
+
+# ----------------- API / DRF -------------------------
+
+class CreateOrderView(generics.CreateAPIView):
+    model = Order
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderSerializer
+    
+    def create(self, request, *args, **kwargs):
+        request.data['customer'] = self.request.user.id
+        print(request.data,'dafs-----------------------')
+        # request.data['orderitem__order'] = self.id
+        
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
