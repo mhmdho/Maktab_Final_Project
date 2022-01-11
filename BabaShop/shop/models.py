@@ -92,6 +92,8 @@ class Product(models.Model):
             while Product.objects.filter(slug = self.slug):
                 self.slug = slugify(self.name)
                 self.slug += self.random_number_generator()
+        if self.stock == 0:
+            self.is_active = False
         return super().save(*args, **kwargs)
     
     def get_image(self):
@@ -107,7 +109,7 @@ class Image(models.Model):
     default = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        main_img = self.product.product_img.filter(product=True)
+        main_img = self.product.product_img.filter(default=True)
         if self.default:
             main_img.update(default=False)
         if not main_img:

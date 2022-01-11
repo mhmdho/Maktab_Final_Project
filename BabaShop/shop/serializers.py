@@ -18,10 +18,3 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-
-
-class ShopProductsSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(source='shop_products', many=True)
-    class Meta:
-        model = Shop
-        fields = ('name', 'type', 'address', 'supplier', 'is_confirmed', 'is_deleted', 'product' )

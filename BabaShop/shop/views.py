@@ -1,22 +1,21 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count
-from django.http import request
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView, UpdateView
 from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic.edit import CreateView
-from shop.filters import ShopListFilter
-from shop.models import Image
-from shop.models import Shop, Product
+from shop.models import Image, Shop, Product
 from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ShopListSerializer, ShopProductsSerializer, ShopTypesSerializer
+from .serializers import ProductSerializer, ShopListSerializer, ShopTypesSerializer
 from rest_framework import generics
+from shop.filters import ShopProductsFilter, ShopListFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.
@@ -189,9 +188,10 @@ class ShopTypesView(generics.ListAPIView):
     serializer_class = ShopTypesSerializer
 
 
-class ShopProductsView(generics.RetrieveAPIView):
+class ShopProductsView(generics.ListAPIView):
+    filterset_class = ShopProductsFilter
     permission_classes = (IsAuthenticated,)
-    serializer_class = ShopProductsSerializer
+    serializer_class = ProductSerializer
 
-    def get_object(self):
-        return get_object_or_404(Shop, slug=self.kwargs['slug'], is_confirmed=True)
+    def get_queryset(self):
+        return Product.objects.filter(shop__slug=self.kwargs['slug'], shop__is_confirmed=True)
