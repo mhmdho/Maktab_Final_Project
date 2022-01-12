@@ -13,7 +13,7 @@ from order.models import Order
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderItemSerializer, OrderSerializer
+from .serializers import OrderItemCreateSerializer, OrderItemSerializer, OrderSerializer
 from rest_framework import generics, status, viewsets
 
 
@@ -157,18 +157,23 @@ class OrderEditstatus(LoginRequiredMixin, View):
 class CreateOrderView(generics.ListCreateAPIView):
     model = OrderItem
     permission_classes = (IsAuthenticated,)
-    serializer_class = OrderItemSerializer
 
     def get_queryset(self, *arg, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
         order = get_object_or_404(Order, shop=shop, customer=self.request.user, is_payment=False)
         return OrderItem.objects.filter(order=order)
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return OrderItemSerializer
+        elif self.request.method == 'POST':
+            return OrderItemCreateSerializer
+
     def create(self, request, *args, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
         product_id = request.data['product']
         if product_id:
-            product = get_object_or_404(Product, id=product_id)
+            product = get_object_or_404(Product, id=product_id, shop__slug=self.kwargs['slug'])
             if product.stock > 0:
                 try:
                     order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
@@ -203,7 +208,7 @@ class DeleteOrderView(generics.DestroyAPIView):
         if orderitem.count() == 0:
             order.delete()
             return Response({'Massage': 'Your basket is empty.'}, status=status.HTTP_204_NO_CONTENT)
-        return Response({'Massage': f'Item {self.id} deleted.'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Massage': 'Item deleted.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class PayOrderView(generics.UpdateAPIView):
@@ -229,3 +234,12 @@ class PayOrderView(generics.UpdateAPIView):
             order.save()
             return Response({'Success': 'Payment done'}, status=status.HTTP_202_ACCEPTED)
         return Response({'Error': 'Incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnpaidOrderView(generics.ListAPIView):
+    model = Order
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderSerializer
+
+    def get_queryset(self, *arg, **kwargs):
+        return Order.objects.filter(customer=self.request.user, is_payment=False)

@@ -45,15 +45,15 @@ class Order(models.Model):
             self.shop_total_quantity += item.quantity
         return self.shop_total_quantity
 
-    def save(self, *args, **kwargs): #move to orderitem
-        self.total_price = 0
-        self.total_quantity = 0
-        order_items = self.orderitem_set.all()
-        for item in order_items:
-            self.total_price += item.total_item_price
-            self.total_quantity += item.quantity
-        self.total_price = self.total_price * (1-self.discount)
-        return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs): #move to orderitem
+    #     self.total_price = 0
+    #     self.total_quantity = 0
+    #     order_items = self.orderitem_set.all()
+    #     for item in order_items:
+    #         self.total_price += item.total_item_price
+    #         self.total_quantity += item.quantity
+    #     self.total_price = self.total_price * (1-self.discount)
+    #     return super().save(*args, **kwargs)
 
     def __str__(self):
         return f'orderd by {self.customer.phone}'
@@ -65,7 +65,7 @@ class OrderItem(models.Model):
     discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
     quantity = models.PositiveIntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.product.name
@@ -75,14 +75,11 @@ class OrderItem(models.Model):
             self.discount = self.product.discount
         if not self.unit_price:
             self.unit_price = self.product.price
-        self.total_item_price = self.unit_price * self.quantity * (1-self.discount)
+        self.total_item_price = self.product.price * self.quantity * (1-self.discount)
         
-        print(self.order.total_price)
-        print('------------')
-        print(self.order.id)
         self.order.total_price += self.total_item_price
-        print(self.order.total_price)
         self.order.total_quantity += self.quantity
+        self.order.save()
         
         self.product.stock -= self.quantity  # move to reduce at final when payment done
         self.product.save()
@@ -90,6 +87,10 @@ class OrderItem(models.Model):
 
 
     def delete(self, using=None, keep_parents=False):
+        self.order.total_price -= self.total_item_price
+        self.order.total_quantity -= self.quantity
+        self.order.save()
+
         self.product.stock += self.quantity
         self.product.save()
 
