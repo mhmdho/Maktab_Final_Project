@@ -243,3 +243,12 @@ class UnpaidOrderView(generics.ListAPIView):
 
     def get_queryset(self, *arg, **kwargs):
         return Order.objects.filter(customer=self.request.user, is_payment=False)
+
+
+class PaidOrderView(generics.ListAPIView):
+    model = Order
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderSerializer
+
+    def get_queryset(self, *arg, **kwargs):
+        return Order.objects.filter(customer=self.request.user, is_payment=True)
