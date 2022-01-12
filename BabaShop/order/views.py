@@ -154,29 +154,35 @@ class OrderEditstatus(LoginRequiredMixin, View):
 
 # ----------------- API / DRF -------------------------
 
-class CreateOrderView(generics.ListCreateAPIView, generics.DestroyAPIView):
+class CreateOrderView(generics.ListCreateAPIView):
     model = OrderItem
     permission_classes = (IsAuthenticated,)
     serializer_class = OrderItemSerializer
 
     def get_queryset(self, *arg, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        order = get_object_or_404(Order, shop=shop, customer=self.request.user, is_payment=False)
         return OrderItem.objects.filter(order=order)
 
     def create(self, request, *args, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        try:
-            order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        except:
-            order = Order.objects.create(shop=shop, customer=self.request.user)
-        
-        request.data['order'] = order.id
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        product_id = request.data['product']
+        if product_id:
+            product = get_object_or_404(Product, id=product_id)
+            if product.stock > 0:
+                try:
+                    order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+                except:
+                    order = Order.objects.create(shop=shop, customer=self.request.user)
+                request.data['order'] = order.id
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response({'Error': 'This product is out of order'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'Error': 'Enter you product'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class DeleteOrderView(generics.DestroyAPIView):
@@ -188,6 +194,16 @@ class DeleteOrderView(generics.DestroyAPIView):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
         order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
         return OrderItem.objects.filter(order=order)
+    
+    def delete(self, request, *args, **kwargs):
+        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        orderitem = OrderItem.objects.filter(order=order)
+        self.destroy(request, *args, **kwargs)
+        if orderitem.count() == 0:
+            order.delete()
+            return Response({'Massage': 'Your basket is empty.'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Massage': f'Item {self.id} deleted.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class PayOrderView(generics.UpdateAPIView):
@@ -202,8 +218,14 @@ class PayOrderView(generics.UpdateAPIView):
     
     def put(self, request, *args, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.filter(shop=shop, customer=self.request.user, is_payment=False)
-        if order.first()['id'] == self.kwargs['pk']:
-            order.update(is_payment=True)
-            return Response({'success': 'payment done'}, status=status.HTTP_202_ACCEPTED)
-        return Response({'error:incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+        except:
+            return Response({'Error': 'No order to pay'}, status=status.HTTP_204_NO_CONTENT)
+        if order.id == self.kwargs['pk']:
+            print(order.is_payment)
+            order.is_payment=True
+            print(order.is_payment)
+            order.save()
+            return Response({'Success': 'Payment done'}, status=status.HTTP_202_ACCEPTED)
+        return Response({'Error': 'Incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)

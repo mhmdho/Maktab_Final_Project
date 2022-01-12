@@ -44,7 +44,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     search_fields = ('product',)
     list_filter = ('status', 'is_payment')
-    list_display = ('customer', 'total_price', 'total_quantity', 'discount', 'created_at', 'status', 'show_image')
+    list_display = ('id', 'customer', 'shop', 'total_price', 'total_quantity', 'discount', 'created_at', 'status', 'show_image', 'is_payment')
 
     @admin.display(empty_value='-',description="show image")
     def show_image(self, obj):
@@ -57,7 +57,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('customer', ('status', 'is_payment'), 'discount')
+            'fields': (('customer', 'shop'), ('status', 'is_payment'), 'discount')
         }),
 
         ('more options', {

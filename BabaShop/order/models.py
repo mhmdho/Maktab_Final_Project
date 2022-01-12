@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, router
+from django.db.models.deletion import Collector
 from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
 from myuser.models import CustomUser
@@ -84,8 +85,22 @@ class OrderItem(models.Model):
         self.order.total_quantity += self.quantity
         
         self.product.stock -= self.quantity  # move to reduce at final when payment done
-        print(self.product.stock)
+        self.product.save()
         return super().save(*args, **kwargs)
+
+
+    def delete(self, using=None, keep_parents=False):
+        self.product.stock += self.quantity
+        self.product.save()
+
+        using = using or router.db_for_write(self.__class__, instance=self)
+        assert self.pk is not None, (
+            "%s object can't be deleted because its %s attribute is set to None." %
+            (self._meta.object_name, self._meta.pk.attname)
+        )
+        collector = Collector(using=using)
+        collector.collect([self], keep_parents=keep_parents)
+        return collector.delete()
 
 
 class ProductComment(models.Model):

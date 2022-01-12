@@ -1,6 +1,4 @@
-from django.db.models.query import Prefetch
 import django_filters
-from django_filters.filters import NumberFilter
 
 from .models import Product, Shop
 
