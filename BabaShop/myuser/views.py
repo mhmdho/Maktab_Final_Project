@@ -108,6 +108,7 @@ class CustomerRegister(generics.CreateAPIView):
 
 
 class CustomerProfileView(generics.RetrieveUpdateAPIView):
+    http_method_names = ['put', 'get']
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerProfileSerializer
     parser_classes = (MultiPartParser, FormParser)

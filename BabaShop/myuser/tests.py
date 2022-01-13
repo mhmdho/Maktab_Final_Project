@@ -76,3 +76,40 @@ class TestCustomerLogin(APITestCase):
         }
         resp = self.client.post(url, data=data)
         self.assertEqual(resp.status_code, 401)
+
+
+class TestCustomerProfile(APITestCase):
+
+    def setUp(self):
+        self.user = mommy.make(CustomUser, phone='09901111112')
+
+    def test_customer_profile_show(self):
+        url = reverse('customer_profile_api')
+        self.client.force_authenticate(self.user)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_customer_profile_unauthorized(self):
+        url = reverse('customer_profile_api')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 401)
+
+    def test_customer_profile_edit_error(self):
+        url = reverse('customer_profile_api')
+        self.client.force_authenticate(self.user)
+        data = {
+            "phone": "09901111111",
+        }
+        resp = self.client.put(url, data=data)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_customer_profile_edit(self):
+        url = reverse('customer_profile_api')
+        self.client.force_authenticate(self.user)
+        data = {
+            "phone": "09901111111",
+            "email": "mohammad@gmail.com",
+            "username": "user111",
+        }
+        resp = self.client.put(url, data=data)
+        self.assertEqual(resp.status_code, 200)
