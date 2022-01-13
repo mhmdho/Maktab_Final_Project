@@ -1,4 +1,5 @@
 from django.db import models, router
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import Collector
 from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
@@ -56,7 +57,7 @@ class Order(models.Model):
     #     return super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'orderd by {self.customer.phone}'
+        return f'order #{self.id} by {self.customer.phone}'
 
 
 class OrderItem(models.Model):
@@ -66,6 +67,9 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     total_item_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ['product', 'order']
 
     def __str__(self):
         return self.product.name
