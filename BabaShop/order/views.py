@@ -185,8 +185,31 @@ class OrderChart(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        context['chart_data'] = Order.objects.filter(shop=context['shop']
+                ).values('customer__username').annotate(
+                                                    order_count=Count('id'),
+                                                    purchase_price=Sum('total_price'),
+                                                    purchase_quantity=Sum('total_quantity')
+                                                    ).order_by()
+        context['barchart_data'] = Order.objects.filter(shop=context['shop']
+                ).values('created_at__date').annotate(
+                                                    order_count=Count('id'),
+                                                    purchase_price=Sum('total_price'),
+                                                    purchase_quantity=Sum('total_quantity')
+                                                    ).order_by('created_at__date')
+        context['barchart_data2'] = Order.objects.filter(shop=context['shop']
+                ).values('created_at__month').annotate(
+                                                    order_count=Count('id'),
+                                                    purchase_price=Sum('total_price'),
+                                                    purchase_quantity=Sum('total_quantity')
+                                                    ).order_by('created_at__month')
+        context['barchart_data3'] = Order.objects.filter(shop=context['shop']
+                ).values('created_at__year').annotate(
+                                                    order_count=Count('id'),
+                                                    purchase_price=Sum('total_price'),
+                                                    purchase_quantity=Sum('total_quantity')
+                                                    ).order_by('created_at__year')
         return context
-
 
 
 # ----------------- API / DRF -------------------------
