@@ -164,9 +164,6 @@ class CustomerList(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-
-        
-
         context['customer_order'] = Order.objects.filter(shop=context['shop']
                 ).values('customer', 'customer__phone', 'customer__image', 'customer__username').annotate(
                                                                         last_order=Max('updated_at'),
@@ -175,6 +172,21 @@ class CustomerList(LoginRequiredMixin, DetailView):
                                                                         purchase_quantity=Sum('total_quantity')
                                                                         ).order_by()
         return context
+
+
+class OrderChart(LoginRequiredMixin, DetailView):
+    template_name = 'order/chart.html'
+    login_url = '/myuser/supplier_login/'
+    model = Shop
+
+    def get_queryset(self, *arg, **kwargs):
+        return Shop.Undeleted.filter(slug=self.kwargs['slug'], supplier=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        return context
+
 
 
 # ----------------- API / DRF -------------------------

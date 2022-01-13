@@ -40,7 +40,7 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         context['total_product_stock'] = total_product_stock
         context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
         context['order_count'] = context['order_list'].count()
-        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
+        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).values('customer').annotate(Count('customer_id')).order_by().count()
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
