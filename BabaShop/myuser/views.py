@@ -104,7 +104,7 @@ class CustomerRegister(generics.CreateAPIView):
         return Response({"Success": "Your registration was successful"}, status=status.HTTP_201_CREATED)
 
 
-class CustomerProfileView(generics.RetrieveUpdateDestroyAPIView):
+class CustomerProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerProfileSerializer
 
