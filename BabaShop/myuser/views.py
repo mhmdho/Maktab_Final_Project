@@ -94,20 +94,6 @@ class MyObtainTokenPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-# class CostumUserAuthentication(authentication.BaseAuthentication):
-#     def authenticate(self, request):
-#         username = request.META.get('HTTP_X_USERNAME')
-#         if not username:
-#             return None
-
-#         try:
-#             user = CustomUser.objects.get(username=username)
-#         except CustomUser.DoesNotExist:
-#             raise exceptions.AuthenticationFailed('No such user')
-
-#         return (user, None)
-
-# from rest_framework_simplejwt.tokens import RefreshToken
 class CustomerRegister(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
