@@ -44,11 +44,15 @@ urlpatterns = [
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
+    path('', MainPageView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('blog/', include('blog.urls')),
     path('myuser/', include('myuser.urls')),
     path('shop/', include('shop.urls')),
     path('order/', include('order.urls')),
-    path('', MainPageView.as_view(), name='index'),
+
+    path('api/v1/myuser/', include('myuser.urls_api')),
+    path('api/v1/shop/', include('shop.urls_api')),
+    path('api/v1/order/', include('order.urls_api')),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

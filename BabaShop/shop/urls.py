@@ -1,6 +1,5 @@
 from django.urls import path
-from .views import CreateProduct, EditProduct, CreateShop, DeleteShop, ShopDetail, EditShop,\
-                ShopListView, ShopProductsView, ShopTypesView
+from .views import CreateProduct, EditProduct, CreateShop, DeleteShop, ShopDetail, EditShop
 
 
 urlpatterns = [
@@ -11,8 +10,4 @@ urlpatterns = [
     path('create_product/<slug:slug>/', CreateProduct.as_view(), name='create_product_url'),
     path('edit_product/<slug:slug>/', EditProduct.as_view(), name='edit_product_url'),
 
-    # API/DRF
-    path('api/shop_list/', ShopListView.as_view(), name='shop_list_api'),
-    path('api/shop_types/', ShopTypesView.as_view(), name='shop_types_api'),
-    path('api/shop/<slug:slug>/product/', ShopProductsView.as_view(), name='shop_products_api'),
 ]

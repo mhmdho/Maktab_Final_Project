@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateOrderView, CustomerList, DeleteOrderView, OrderChart, OrderEditstatus, OrderList, PaidOrderView, PayOrderView, ProductList, OrderDetail, UnpaidOrderView
+from .views import CustomerList, OrderChart, OrderEditstatus, OrderList, ProductList, OrderDetail
 
 
 urlpatterns = [
@@ -9,12 +9,5 @@ urlpatterns = [
     path('order_eidt_status/<slug:slug>/<int:pk>/', OrderEditstatus.as_view(), name='order_status_url'),
     path('customer_list/<slug:slug>/', CustomerList.as_view(), name='customer_list_url'),
     path('chart/<slug:slug>/', OrderChart.as_view(), name='order_chart_url'),
-
-    # API/DRF
-    path('api/shop/<slug:slug>/order/', CreateOrderView.as_view(), name='create_order_api'),
-    path('api/shop/<slug:slug>/order/<int:pk>/', DeleteOrderView.as_view(), name='delete_order_api'),
-    path('api/shop/<slug:slug>/order/<int:pk>/pay/', PayOrderView.as_view(), name='pay_order_api'),
-    path('api/order/', UnpaidOrderView.as_view(), name='open_order_api'),
-    path('api/closed_order/', PaidOrderView.as_view(), name='closed_order_api'),
 
 ]
