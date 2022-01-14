@@ -6,9 +6,11 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'quantity', 'order']
-        # extra_kwargs = {
-        #     'order': {'read_only': True}
-        # }
+        extra_kwargs = {
+            'order': {
+                'allow_null': True,
+            },
+        }
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -22,5 +24,8 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
-    
 
+class OrderPaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['is_payment']

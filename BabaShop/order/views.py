@@ -5,7 +5,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
-from myuser.models import CustomUser
 from order.Filters import OrderFilter
 from order.models import OrderItem
 from django.shortcuts import get_object_or_404, redirect
@@ -15,7 +14,7 @@ from order.models import Order
 
 # API/DRF
 from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderItemCreateSerializer, OrderItemSerializer, OrderSerializer
+from .serializers import OrderItemCreateSerializer, OrderItemSerializer, OrderPaySerializer, OrderSerializer
 from rest_framework import generics, status, viewsets
 
 
@@ -242,18 +241,14 @@ class CreateOrderView(generics.ListCreateAPIView):
                         order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
                     except:
                         order = Order.objects.create(shop=shop, customer=self.request.user)
-                    print('1----------------------------------------------')
                     request.data['order'] = order.id
-                    print('2----------------------------------------------')
-
                     serializer = self.get_serializer(data=request.data)
                     serializer.is_valid(raise_exception=True)
                     self.perform_create(serializer)
                     headers = self.get_success_headers(serializer.data)
                     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            return Response({'Error': 'This product is out of order'}, status=status.HTTP_404_NOT_FOUND)
-        return Response({'Error': 'Enter you product'}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({'Error': 'This product is out of order'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': 'Enter your product'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteOrderView(generics.DestroyAPIView):
@@ -281,12 +276,11 @@ class PayOrderView(generics.UpdateAPIView):
     http_method_names = ['put',]
     model = Order
     permission_classes = (IsAuthenticated,)
-    serializer_class = OrderSerializer
+    serializer_class = OrderPaySerializer
 
     def get_queryset(self, *arg, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        return order
+        return Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
     
     def put(self, request, *args, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])

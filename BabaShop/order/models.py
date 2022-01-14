@@ -95,6 +95,9 @@ class OrderItem(models.Model):
         self.order.total_quantity -= self.quantity
         self.order.save()
 
+        if self.product.stock == 0:
+            if self.product.is_active == False:
+                self.product.is_active = True
         self.product.stock += self.quantity
         self.product.save()
 
