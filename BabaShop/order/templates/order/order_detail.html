@@ -137,11 +137,11 @@
                         <tr>
                             <td class="text-center"></td>
                             <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">Total QTY: {{ order.total_quantity }}</td>
+                            <td class="text-center">{{ shop_total_price }}</td>
+                            <td class="text-center">Total QTY: {{ shop_total_quantity }}</td>
                             <td class="text-center">% Discount: {{ order.discount }}</td>
                             <td class="text-center">-</td>
-                            <td class="text-center"><b>Total Price: {{ order.total_price }}</b></td>
+                            <td class="text-center"><b>Total Price: {{ shop_total_price }}</b></td>
                         </tr>
                     </tbody>
                 </table>

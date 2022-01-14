@@ -9,19 +9,46 @@
             <div class="card-header">{{ shop.name }} Orders
                 <div class="btn-actions-pane-right">
                     <div role="group" class="btn-group-sm btn-group">
-                        <form method="get" action="">
-                            {{ filter.form }}
-                            <br/><br/>
-                            <input type="submit">
-                        </form>
-                        <button class="active btn btn-focus">Last Week</button>
-                        <button class="btn btn-focus">All Month</button>
+
                     </div>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="align-middle mb-0 table table-borderless table-striped table-hover">
                     <thead>
+
+                        <br>
+                        <tr>
+                            <div class="container">
+
+                                <div class="row text-center align-middle widget-content-wrapper">
+                                    <form method="get" action="">
+                                        <div class="col-4 widget-subheading opacity-7 widget-content-right">
+                                            <b>
+                                                Start Date: {{ filter.form.start_date }}
+                                            </b>
+                                        </div>
+                                        <div class="col-4 widget-subheading opacity-7 widget-content-left">
+                                            <b>
+                                                End Date: {{ filter.form.end_date }}
+                                            </b>
+                                        </div>
+                                        <!-- <div class="col-1"></div> -->
+                                        <div class="col-3 widget-subheading opacity-7">
+                                            <b>
+                                                Status: {{ filter.form.status }}
+                                            </b>
+                                        </div>
+                                        <div class="col-1 widget-content-right">
+                                            <input class="btn btn-primary btn-sm" type="submit">
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </tr>
+                        <hr>
+
                         <tr>
                             <th class="text-center">#</th>
                             <th>Customer</th>
@@ -76,38 +103,41 @@
                             </td>
                             <td class="text-center">
 
-                                <select name="status" id="id_status" {% if order.status == 'CANCELED' %} disabled {% endif %}>
-                                    <option value="CONFIRMED" {% if order.status == 'CONFIRMED' %} selected="" {% endif %}>CONFIRMED</option>
-                                    <option value="CHECKING" {% if order.status == 'CHECKING' %} selected="" {% endif %}>CHECKING</option>
-                                    <option value="" {% if  not order.status %} selected ="" {% endif %}disabled>---------</option>
-                                <input  hidden value={{order.product.SHOP.slug}} name = "slug">
-                                <input class="btn btn-success btn-icon-split" type="submit" value= 'Save' >
+
 
                                 {% if order.status == 'CONFIRMED' %}
-                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-success w-100 btn">{{ order.status }}</div>
-                                {% elif order.status == 'CHECKING' %}
-                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-warning w-100 btn">{{ order.status }}...</div>
-                                {% else %}
-                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="badge badge-danger w-100 btn">{{ order.status }}</div>
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                <a href="{% url 'order_detail_url' slug=shop.slug id=order.id %}" type="button" id="PopoverCustomT-1"
-                                    class="btn btn-primary btn-sm">Details</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                                <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}"
+                                    class="btn btn-success w-100" onclick="setAttr(this)"> {{ order.status }} </a>
 
-                    </tbody>
-                </table>
             </div>
-            <div class="d-block text-center card-footer">
-                <a href="{% url 'create_product_url' slug=shop.slug %}" class="btn-wide btn btn-outline-warning">
-                    Save
-                </a>
-            </div>
+            {% elif order.status == 'CHECKING' %}
+            <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="btn btn-warning w-100"
+                onclick="setAttr(this)"> {{ order.status }}... </a>
+
         </div>
+        {% else %}
+        <a href="{% url 'order_status_url' slug=shop.slug pk=order.id %}" class="btn btn-danger w-100"
+            onclick="setAttr(this)"> {{ order.status }} </a>
+
     </div>
+    {% endif %}
+    </td>
+    <td class="text-center">
+        <a href="{% url 'order_detail_url' slug=shop.slug id=order.id %}" type="button" id="PopoverCustomT-1"
+            class="btn btn-primary btn-sm">Details</a>
+    </td>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+    </table>
+</div>
+<div class="d-block text-center card-footer">
+
+
+</div>
+</div>
+</div>
 </div>
 
 

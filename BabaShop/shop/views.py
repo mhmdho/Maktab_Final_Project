@@ -1,19 +1,21 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView, UpdateView
-from django.views.generic.base import ContextMixin, TemplateView, View
+from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
-from shop.models import Image
-from shop.forms import AddImageForm
-
-from shop.models import Shop, Product
+from shop.models import Image, Shop, Product
 from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
+
+# API/DRF
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ProductSerializer, ShopListSerializer, ShopTypesSerializer
+from rest_framework import generics
+from shop.filters import ShopProductsFilter, ShopListFilter
+
 
 # Create your views here.
 
@@ -38,11 +40,14 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         context['total_product_stock'] = total_product_stock
         context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
         context['order_count'] = context['order_list'].count()
-        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
+        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).values('customer').annotate(Count('customer_id')).order_by().count()
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
+            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['orders_value'] = orders_value
+
         return context
 
 
@@ -92,6 +97,41 @@ class EditShop(LoginRequiredMixin,UpdateView):
         return super().post(request, *args, **kwargs)
 
 
+class EditProduct(LoginRequiredMixin,UpdateView):
+    template_name = 'shop/edit_product.html'
+    login_url = '/myuser/supplier_login/'
+    model = Shop
+    form_class = CreateProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
+        return context
+
+    def get_success_url(self):
+        slug = self.kwargs["slug"]
+        return reverse("shop_detail_url", kwargs={"slug": slug})
+
+    def post(self, request, *args, **kwargs):
+        # shop = Shop.Undeleted.filter(slug=self.kwargs['slug'])
+        # shop.update(is_confirmed = False)
+        # self.object = self.get_object()
+        # return super().post(request, *args, **kwargs)
+        form = CreateProductForm(request.POST, request.FILES)
+        form.instance.shop = Shop.Undeleted.get(slug=self.kwargs['slug'])
+        if form.is_valid():
+            form.save()
+            for i in range(1,5):
+                if form.cleaned_data[f'image{i}'] is not None:
+                    Image.objects.create(image=form.cleaned_data[f'image{i}'], product=form.instance)
+            
+            messages.success(request, "New product created." )
+            return redirect("shop_detail_url", self.kwargs["slug"])
+
+        messages.info(request, "You must input all fields." )
+        return redirect("create_product_url", self.kwargs["slug"])
+
+
 class DeleteShop(LoginRequiredMixin,UpdateView):
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -130,3 +170,27 @@ class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
 
         messages.info(request, "You must input all fields." )
         return redirect("create_product_url", self.kwargs["slug"])
+
+
+# ----------------- API / DRF -------------------------
+
+class ShopListView(generics.ListAPIView):
+    filterset_class = ShopListFilter
+    queryset = Shop.Undeleted.filter(is_confirmed=True)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ShopListSerializer
+
+
+class ShopTypesView(generics.ListAPIView):
+    queryset = Shop.Undeleted.filter(is_confirmed=True).distinct('type')
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ShopTypesSerializer
+
+
+class ShopProductsView(generics.ListAPIView):
+    filterset_class = ShopProductsFilter
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        return Product.objects.filter(shop__slug=self.kwargs['slug'], shop__is_confirmed=True)

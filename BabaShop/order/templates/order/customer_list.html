@@ -1,0 +1,78 @@
+{% extends "dashboard.html" %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">{{ shop.name }} Customers
+                <div class="btn-actions-pane-right">
+                    <div role="group" class="btn-group-sm btn-group">
+
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#id</th>
+                            <th>Customer</th>
+                            <th class="text-center">Last Order</th>
+                            <th class="text-center">Total Order</th>
+                            <th class="text-center">Total Price</th>
+                            <th class="text-center">Total QTY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for order in customer_order %}
+                        <tr>
+                            <td class="text-center text-muted">#{{ order.customer }}</td>
+                            <td>
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left mr-3">
+                                            <div class="widget-content-left">
+                                                <img width="40" height="40" class="rounded-circle"
+                                                    src="/media/{{ order.customer__image }}" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="widget-content-left flex2">
+                                            <div class="widget-heading">
+                                                {{ order.customer__username }}
+                                            </div>
+                                            <div class="widget-subheading opacity-7">
+                                                {{ order.customer__phone }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">{{ order.last_order }}</td>
+                            <td class="text-center">{{ order.order_count }}</td>
+                            <td class="text-center">{{ order.purchase_price }}</td>
+                            <td class="text-center">{{ order.purchase_quantity }}</td>
+
+
+                            <td class="text-center">
+                                <a href="{% url 'order_list_url' slug=shop.slug %}" type="button" id="PopoverCustomT-1"
+                                    class="btn btn-primary btn-sm">Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-block text-center card-footer">
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
