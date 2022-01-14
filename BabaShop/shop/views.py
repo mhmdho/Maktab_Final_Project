@@ -182,7 +182,7 @@ class ShopListView(generics.ListAPIView):
 
 
 class ShopTypesView(generics.ListAPIView):
-    queryset = Shop.Undeleted.distinct('type')
+    queryset = Shop.Undeleted.filter(is_confirmed=True).distinct('type')
     permission_classes = (IsAuthenticated,)
     serializer_class = ShopTypesSerializer
 
