@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.views.generic import DetailView, UpdateView
 from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,12 +9,6 @@ from django.views.generic.edit import CreateView
 from shop.models import Image, Shop, Product
 from order.models import Order
 from shop.forms import CreateShopForm, CreateProductForm
-
-# API/DRF
-from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductSerializer, ShopListSerializer, ShopTypesSerializer
-from rest_framework import generics
-from shop.filters import ShopProductsFilter, ShopListFilter
 
 
 # Create your views here.
@@ -170,27 +164,3 @@ class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
 
         messages.info(request, "You must input all fields." )
         return redirect("create_product_url", self.kwargs["slug"])
-
-
-# ----------------- API / DRF -------------------------
-
-class ShopListView(generics.ListAPIView):
-    filterset_class = ShopListFilter
-    queryset = Shop.Undeleted.filter(is_confirmed=True)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = ShopListSerializer
-
-
-class ShopTypesView(generics.ListAPIView):
-    queryset = Shop.Undeleted.filter(is_confirmed=True).distinct('type')
-    permission_classes = (IsAuthenticated,)
-    serializer_class = ShopTypesSerializer
-
-
-class ShopProductsView(generics.ListAPIView):
-    filterset_class = ShopProductsFilter
-    permission_classes = (IsAuthenticated,)
-    serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        return Product.objects.filter(shop__slug=self.kwargs['slug'], shop__is_confirmed=True)

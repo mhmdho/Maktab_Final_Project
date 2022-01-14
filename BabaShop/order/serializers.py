@@ -5,7 +5,7 @@ from order.models import OrderItem, Order
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'order']
+        fields = ['order', 'id', 'product', 'quantity']
         extra_kwargs = {
             'order': {
                 'allow_null': True,

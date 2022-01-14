@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import CustomerRegister
-from myuser.views import MyObtainTokenPairView, CustomerProfileView
+from .views_api import CustomerRegister,\
+                    MyObtainTokenPairView, CustomerProfileView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 

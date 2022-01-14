@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateOrderView, DeleteOrderView, PaidOrderView, PayOrderView, UnpaidOrderView
+from .views_api import CreateOrderView, DeleteOrderView, PaidOrderView, PayOrderView, UnpaidOrderView
 
 
 urlpatterns = [
