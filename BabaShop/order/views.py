@@ -3,6 +3,7 @@ from django.db.models.aggregates import Count, Max, Sum
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from myuser.models import CustomUser
 from order.Filters import OrderFilter
@@ -217,6 +218,7 @@ class OrderChart(LoginRequiredMixin, DetailView):
 class CreateOrderView(generics.ListCreateAPIView):
     model = OrderItem
     permission_classes = (IsAuthenticated,)
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self, *arg, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
@@ -272,6 +274,7 @@ class DeleteOrderView(generics.DestroyAPIView):
 
 
 class PayOrderView(generics.UpdateAPIView):
+    http_method_names = ['put',]
     model = Order
     permission_classes = (IsAuthenticated,)
     serializer_class = OrderSerializer

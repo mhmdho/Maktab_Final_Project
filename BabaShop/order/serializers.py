@@ -6,6 +6,9 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'quantity', 'order']
+        extra_kwargs = {
+            'order': {'read_only': True}
+        }
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -18,5 +21,6 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+
     
 
