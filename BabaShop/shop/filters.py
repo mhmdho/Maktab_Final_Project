@@ -19,4 +19,4 @@ class ShopProductsFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['tag', 'price__lt', 'price__lt', 'available']
+        fields = ['tag', 'price__lt', 'price__gt', 'available']
