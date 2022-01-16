@@ -85,9 +85,10 @@ class OrderItem(models.Model):
         self.order.total_quantity += self.quantity
         self.order.save()
         
-        self.product.stock -= self.quantity  # move to reduce at final when payment done
-        self.product.save()
-        return super().save(*args, **kwargs)
+        if self.product.stock >= self.quantity:
+            self.product.stock -= self.quantity  # move to reduce at final when payment done
+            self.product.save()
+            return super().save(*args, **kwargs)
 
 
     def delete(self, using=None, keep_parents=False):

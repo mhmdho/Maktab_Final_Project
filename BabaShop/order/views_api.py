@@ -16,7 +16,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 class CreateOrderView(generics.ListCreateAPIView):
     model = OrderItem
     permission_classes = (IsAuthenticated,)
-    # parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self, *arg, **kwargs):
         shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
@@ -29,25 +29,25 @@ class CreateOrderView(generics.ListCreateAPIView):
         elif self.request.method == 'POST':
             return OrderItemCreateSerializer
 
-    def create(self, request, *args, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        product_id = request.data['product']
-        if product_id:
-            product = get_object_or_404(Product, id=product_id, shop__slug=self.kwargs['slug'])
-            if product.stock > 0:
-                if product.is_active == True:
-                    try:
-                        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-                    except:
-                        order = Order.objects.create(shop=shop, customer=self.request.user)
-                    request.data['order'] = order.id
-                    serializer = self.get_serializer(data=request.data)
-                    serializer.is_valid(raise_exception=True)
-                    self.perform_create(serializer)
-                    headers = self.get_success_headers(serializer.data)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            return Response({'Error': 'This product is out of order'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'Error': 'Enter your product'}, status=status.HTTP_400_BAD_REQUEST)
+    # def create(self, request, *args, **kwargs):
+    #     shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
+    #     product_id = request.data['product']
+    #     if product_id:
+    #         product = get_object_or_404(Product, id=product_id, shop__slug=self.kwargs['slug'])
+    #         if product.stock > 0:
+    #             if product.is_active == True:
+    #                 try:
+    #                     order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
+    #                 except:
+    #                     order = Order.objects.create(shop=shop, customer=self.request.user)
+    #                 request.data['order'] = order.id
+    #                 serializer = self.get_serializer(data=request.data)
+    #                 serializer.is_valid(raise_exception=True)
+    #                 self.perform_create(serializer)
+    #                 headers = self.get_success_headers(serializer.data)
+    #                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    #         return Response({'Error': 'This product is out of order'}, status=status.HTTP_400_BAD_REQUEST)
+    #     return Response({'Error': 'Enter your product'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteOrderView(generics.DestroyAPIView):

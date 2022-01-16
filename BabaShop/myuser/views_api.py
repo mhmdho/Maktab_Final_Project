@@ -7,7 +7,7 @@ from .serializers import CustomerProfileSerializer, RegisterSerializer
 from rest_framework import generics
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase, serializers
 from rest_framework.parsers import FormParser, MultiPartParser
 
 
@@ -18,6 +18,17 @@ class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
     parser_classes = (MultiPartParser, FormParser)
+
+
+class TokenRefreshView2(TokenViewBase):
+    """
+    Takes a refresh type JSON web token and returns an access type JSON web
+    token if the refresh token is valid.
+    """
+    serializer_class = serializers.TokenRefreshSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+token_refresh = TokenRefreshView2.as_view()
 
 
 class CustomerRegister(generics.CreateAPIView):
@@ -39,3 +50,10 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return get_object_or_404(CustomUser, id=self.request.user.id)
+
+
+class CustomerLoginCode(generics.RetrieveUpdateAPIView):
+    http_method_names = ['put', 'get']
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CustomerProfileSerializer
+    parser_classes = (MultiPartParser, FormParser)
