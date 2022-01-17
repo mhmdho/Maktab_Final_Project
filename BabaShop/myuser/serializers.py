@@ -47,3 +47,10 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('phone', 'email', 'username', 'image', 'first_name', 'last_name')
+
+
+class CustomerPhoneVerifySerializer(serializers.ModelSerializer):
+    otp = serializers.CharField(write_only=True, required=True)
+    class Meta:
+        model = CustomUser
+        fields = ('otp',)

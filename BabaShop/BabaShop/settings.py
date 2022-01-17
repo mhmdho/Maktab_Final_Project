@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'drf_yasg',
     'django_otp',
+    # 'django_otp.plugins.otp_totp',
 
     'blog',
     'myuser',
