@@ -41,7 +41,7 @@ class CustomUser(AbstractUser):
         help_text=_('Designates whether the user can log as a supplier.'),
     )
 
-    is_Phone_verified = models.BooleanField(
+    is_phone_verified = models.BooleanField(
         _('phone status'),
         default=False,
         help_text=_('Designates whether the phone verified.'),

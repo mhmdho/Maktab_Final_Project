@@ -83,6 +83,9 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
         else:
             if OTP.verify(token):
                 self.verified = True
+                customer = get_object_or_404(CustomUser, id=self.request.user.id)
+                customer.is_phone_verified = True
+                customer.save()
             else:
                 self.verified = False
         super().put(request, *args, **kwargs)
