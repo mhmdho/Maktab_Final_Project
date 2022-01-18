@@ -57,6 +57,8 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
 
+OTP=TOTP(key=b'9fe43-4r54r-31034-rm32q', step=300, digits=6, t0=int(time.time()))
+
 class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerPhoneVerifySerializer
@@ -65,13 +67,23 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
-    def get(self, request, *args, **kwargs):
-        totp = TOTP(key=b'9fe43-4r54r-31034-rm32q',step=300, digits=6)
-        totp.time = time.time()        
+    def get(self, request, *args, **kwargs):     
         super().get(request, *args, **kwargs)
-
-        expire_at = datetime.fromtimestamp(totp.time) + timedelta(minutes=5)
-        expire_at = expire_at.strftime('%Y-%b-%d %H:%M:%S')
-        return Response({"Verify Code": str(totp.token()).zfill(6),
+        expire = OTP.t0 + OTP.step * (OTP.t()+1)
+        expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
+        return Response({"Verify Code": str(OTP.token()).zfill(6),
                         "Expire at": expire_at},
                          status=status.HTTP_201_CREATED)
+        
+    def put(self, request, *args, **kwargs):
+        try:
+            token = int(self.request.data['otp'])
+        except ValueError:
+            self.verified = False
+        else:
+            if OTP.verify(token):
+                self.verified = True
+            else:
+                self.verified = False
+        super().put(request, *args, **kwargs)
+        return Response({"Verified": self.verified}, status=status.HTTP_200_OK)
