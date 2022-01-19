@@ -1,4 +1,5 @@
 import base64
+from encodings import utf_8
 from urllib import response
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -16,9 +17,15 @@ from django_otp.oath import TOTP
 from django_otp.util import random_hex
 from datetime import datetime
 import time
+import redis
+from django.conf import settings
 
 
 # Create your views here.
+
+
+r = redis.StrictRedis(host=settings.REDIS_HOST,
+                    port=settings.REDIS_PORT, db=0)
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -58,8 +65,6 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
-OTP=TOTP(key=bytes(random_hex(), 'utf-8'), 
-        step=300, digits=6, t0=int(time.time()))
 
 class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
     http_method_names = ['put', 'get']
@@ -76,28 +81,34 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
         if customer.is_phone_verified:
             return Response({"Message": "Your phone have been verified"},
                             status=status.HTTP_200_OK)
+        OTP=TOTP(key=bytes(random_hex(), 'utf-8'), 
+                step=300, digits=6, t0=int(time.time()))
         expire = OTP.t0 + OTP.step * (OTP.t()+1)
         expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
-        return Response({"Verify Code": str(OTP.token()).zfill(6),
+        r.set(customer.phone, OTP.token())
+        r.expire(customer.phone, 300)
+        return Response({"Verify Code": OTP.token(),
                         "Expire at": expire_at},
                          status=status.HTTP_201_CREATED)
         
     def put(self, request, *args, **kwargs):
         customer = get_object_or_404(CustomUser, id=self.request.user.id)
         if customer.is_phone_verified:
+            customer.is_phone_verified = False
+            customer.save()
             return Response({"Message": "Your phone have been verified before"},
                             status=status.HTTP_200_OK)
         try:
-            token = int(self.request.data['otp'])
+            token = bytes(self.request.data['otp'], 'utf-8')
         except ValueError:
-            self.verified = False
+            pass
         else:
-            if OTP.verify(token):
-                self.verified = True
-                customer = get_object_or_404(CustomUser, id=self.request.user.id)
-                customer.is_phone_verified = True
-                customer.save()
-            else:
-                self.verified = False
+            if r.exists(customer.phone):
+                otp = r.get(customer.phone)
+                if otp == token:
+                    customer.is_phone_verified = True
+                    customer.save()
+
         super().put(request, *args, **kwargs)
-        return Response({"Verified": self.verified}, status=status.HTTP_200_OK)
+        return Response({"Verified": customer.is_phone_verified},
+                        status=status.HTTP_200_OK)
