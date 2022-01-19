@@ -1,6 +1,3 @@
-import base64
-from encodings import utf_8
-from urllib import response
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from myuser.models import CustomUser
@@ -17,15 +14,10 @@ from django_otp.oath import TOTP
 from django_otp.util import random_hex
 from datetime import datetime
 import time
-import redis
-from django.conf import settings
+from django.core.cache import cache
 
 
 # Create your views here.
-
-
-r = redis.StrictRedis(host=settings.REDIS_HOST,
-                    port=settings.REDIS_PORT, db=0)
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -85,8 +77,7 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
                 step=300, digits=6, t0=int(time.time()))
         expire = OTP.t0 + OTP.step * (OTP.t()+1)
         expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
-        r.set(customer.phone, OTP.token())
-        r.expire(customer.phone, 300)
+        cache.set(customer.phone, OTP.token(), timeout=300)
         return Response({"Verify Code": OTP.token(),
                         "Expire at": expire_at},
                          status=status.HTTP_201_CREATED)
@@ -94,20 +85,17 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
     def put(self, request, *args, **kwargs):
         customer = get_object_or_404(CustomUser, id=self.request.user.id)
         if customer.is_phone_verified:
-            customer.is_phone_verified = False
-            customer.save()
             return Response({"Message": "Your phone have been verified before"},
                             status=status.HTTP_200_OK)
         try:
-            token = bytes(self.request.data['otp'], 'utf-8')
+            entered_otp = int(self.request.data['otp'])
         except ValueError:
             pass
         else:
-            if r.exists(customer.phone):
-                otp = r.get(customer.phone)
-                if otp == token:
-                    customer.is_phone_verified = True
-                    customer.save()
+            otp = cache.get(customer.phone)
+            if otp == entered_otp:
+                customer.is_phone_verified = True
+                customer.save()
 
         super().put(request, *args, **kwargs)
         return Response({"Verified": customer.is_phone_verified},
