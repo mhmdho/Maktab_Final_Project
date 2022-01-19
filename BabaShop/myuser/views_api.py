@@ -1,3 +1,4 @@
+import base64
 from urllib import response
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -12,7 +13,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase, s
 from rest_framework.parsers import FormParser, MultiPartParser
 
 from django_otp.oath import TOTP
-from datetime import timedelta, datetime
+from django_otp.util import random_hex
+from datetime import datetime
 import time
 
 
@@ -56,10 +58,11 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
-
-OTP=TOTP(key=b'9fe43-4r54r-31034-rm32q', step=300, digits=6, t0=int(time.time()))
+OTP=TOTP(key=bytes(random_hex(), 'utf-8'), 
+        step=300, digits=6, t0=int(time.time()))
 
 class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
+    http_method_names = ['put', 'get']
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerPhoneVerifySerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -67,8 +70,12 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
-    def get(self, request, *args, **kwargs):     
+    def get(self, request, *args, **kwargs):   
         super().get(request, *args, **kwargs)
+        customer = get_object_or_404(CustomUser, id=self.request.user.id)
+        if customer.is_phone_verified:
+            return Response({"Message": "Your phone have been verified"},
+                            status=status.HTTP_200_OK)
         expire = OTP.t0 + OTP.step * (OTP.t()+1)
         expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
         return Response({"Verify Code": str(OTP.token()).zfill(6),
@@ -76,6 +83,10 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
                          status=status.HTTP_201_CREATED)
         
     def put(self, request, *args, **kwargs):
+        customer = get_object_or_404(CustomUser, id=self.request.user.id)
+        if customer.is_phone_verified:
+            return Response({"Message": "Your phone have been verified before"},
+                            status=status.HTTP_200_OK)
         try:
             token = int(self.request.data['otp'])
         except ValueError:
