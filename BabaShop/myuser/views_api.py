@@ -9,13 +9,9 @@ from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase, serializers
 from rest_framework.parsers import FormParser, MultiPartParser
-
-from django_otp.oath import TOTP
-from django_otp.util import random_hex
-from datetime import datetime
-import time
-from django.core.cache import cache
 from rest_framework.views import APIView
+from django.core.cache import cache
+from .utils import OTP
 
 
 # Create your views here.
@@ -74,13 +70,10 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
         if customer.is_phone_verified:
             return Response({"Message": "Your phone have been verified"},
                             status=status.HTTP_200_OK)
-        OTP=TOTP(key=bytes(random_hex(), 'utf-8'), 
-                step=300, digits=6, t0=int(time.time()))
-        expire = OTP.t0 + OTP.step * (OTP.t()+1)
-        expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
-        cache.set(customer.phone, OTP.token(), timeout=300)
-        return Response({"Verify Code": OTP.token(),
-                        "Expire at": expire_at},
+        otp = OTP(customer.phone)
+        # cache.set(customer.phone, otp.generate_token(), timeout=300)
+        return Response({"Verify Code": otp.generate_token(),
+                        "Expire at": otp.expire_at},
                          status=status.HTTP_201_CREATED)
         
     def put(self, request, *args, **kwargs):
@@ -89,17 +82,14 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
         if customer.is_phone_verified:
             return Response({"Message": "Your phone have been verified before"},
                             status=status.HTTP_200_OK)
-        try:
-            entered_otp = int(self.request.data['otp'])
-        except ValueError:
-            pass
-        else:
-            otp = cache.get(customer.phone)
-            if otp == entered_otp:
-                customer.is_phone_verified = True
-                customer.save()
-        return Response({"Verified": customer.is_phone_verified},
-                        status=status.HTTP_200_OK)
+        otp = OTP(customer.phone)
+        if otp.verify_token(self.request.data['otp']):
+            customer.is_phone_verified = True
+            customer.save()
+            return Response({"Verified": customer.is_phone_verified},
+                            status=status.HTTP_200_OK)
+        return Response({"Error": "Wrong OTP or expired"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomerLoginOtp(APIView):
@@ -111,13 +101,9 @@ class CustomerLoginOtp(APIView):
         customer = get_object_or_404(CustomUser, phone=self.kwargs['phone'])
         if customer:
             if customer.is_phone_verified:
-                OTP=TOTP(key=bytes(self.kwargs['phone']+str(time.time()//300), 'utf-8'), 
-                        step=300, digits=6)
-                expire = OTP.t0 + OTP.step * (OTP.t()+1)
-                expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
-                cache.set(customer.phone, OTP.token(), timeout=300)
-                return Response({"Verify Code": str(OTP.token()).zfill(6),
-                                "Expire at": expire_at},
+                otp = OTP(self.kwargs['phone'])
+                return Response({"Verify Code": otp.generate_token(),
+                                "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
             return Response({"Verified": "Your phone is not verified"},
                             status=status.HTTP_401_UNAUTHORIZED)
