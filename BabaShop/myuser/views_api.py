@@ -1,3 +1,4 @@
+from inspect import Parameter
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from myuser.models import CustomUser
@@ -11,6 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase, s
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.views import APIView
 from django.core.cache import cache
+from drf_yasg.utils import swagger_auto_schema
 from .utils import OTP
 
 
@@ -113,7 +115,13 @@ class CustomerLoginOtp(APIView):
     serializer_class = CustomerLoginOtpSerializer
     parser_classes = (MultiPartParser, FormParser)
 
-    def get(self, request, *args, **kwargs):
+
+    @swagger_auto_schema(
+        responses={'201': CustomerLoginOtpSerializer,
+                   '401': 'If user phone not verified',
+                   '404': 'If user not registered'}
+    )
+    def post(self, request, *args, **kwargs):
         customer = get_object_or_404(CustomUser, phone=self.kwargs['phone'])
         if customer:
             if customer.is_phone_verified:
@@ -121,7 +129,7 @@ class CustomerLoginOtp(APIView):
                 return Response({"Verify Code": otp.generate_token(),
                                 "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
-            return Response({"Verified": "Your phone is not verified"},
+            return Response({"Error": "Your phone is not verified"},
                             status=status.HTTP_401_UNAUTHORIZED)
-        return Response({"Verified": "You have not registered yet"},
+        return Response({"Error": "You have not registered yet"},
                         status=status.HTTP_404_NOT_FOUND)

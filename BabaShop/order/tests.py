@@ -150,9 +150,6 @@ class TestOpenOrders(APITestCase):
         self.assertEqual(len(resp.data), 1)
 
 
-
-
-
 class TestClosedOrders(APITestCase):
 
     def setUp(self):
@@ -176,4 +173,3 @@ class TestClosedOrders(APITestCase):
         self.client.force_authenticate(self.user)
         resp = self.client.get(url)
         self.assertEqual(len(resp.data), 3)
-
