@@ -18,6 +18,10 @@ from .utils import OTP
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
+    """
+    Takes a set of user credentials and returns an access and refresh JSON web
+    token pair to prove the authentication of those credentials.
+    """
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -35,6 +39,9 @@ token_refresh = TokenRefreshView2.as_view()
 
 
 class CustomerRegister(generics.CreateAPIView):
+    """
+    Takes a set of informations and register customer.
+    """
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
@@ -46,6 +53,9 @@ class CustomerRegister(generics.CreateAPIView):
 
 
 class CustomerProfileView(generics.RetrieveUpdateAPIView):
+    """
+    Shows and update the customer profile.
+    """
     http_method_names = ['put', 'get']
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerProfileSerializer
@@ -56,6 +66,9 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
 
 
 class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
+    """
+    Generates an otp and takes the otp to verify customer phone number.
+    """
     http_method_names = ['put', 'get']
     permission_classes = (IsAuthenticated,)
     serializer_class = CustomerPhoneVerifySerializer
@@ -93,6 +106,9 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
 
 
 class CustomerLoginOtp(APIView):
+    """
+    Generates otp in order to customer login.
+    """
     permission_classes = (AllowAny,)
     serializer_class = CustomerLoginOtpSerializer
     parser_classes = (MultiPartParser, FormParser)
