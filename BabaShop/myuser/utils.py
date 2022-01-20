@@ -4,6 +4,9 @@ import time
 
 
 class OTP:
+    """
+    Generate otp based on user phone number.
+    """
     def __init__(self, phone):        
         self.digits = 6
         self.step = 300  # seconds that otp will expire
