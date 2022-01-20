@@ -11,6 +11,9 @@ import random
 
 
 class Shop(models.Model):
+    """
+    Shops of website, each supplier can create more than one shop.
+    """
     SUP = "SUPERMARKET"
     HYP = "HYPERMARKET"
     GRE = "GREENGROCER"
@@ -60,6 +63,9 @@ class Shop(models.Model):
 
 
 class Product(models.Model):
+    """
+    products of each shop. Each product have its own shop.
+    """
     slug = models.SlugField(max_length=70, blank=True, unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
@@ -71,14 +77,9 @@ class Product(models.Model):
     description = models.TextField(max_length=400)
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE) 
     tag = models.ManyToManyField('ProductTag', blank=True)
-    # like = models.IntegerField(default=0, null=True, blank=True)
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE, related_name='shop_products')
     is_active = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
-
-    # objects = models.Manager()
-    # Confirmed = ConfirmedProduct()
-    # Unconfirmed = UnconfirmedProduct()
 
     class Meta:
         ordering = ['-id']
@@ -104,6 +105,9 @@ class Product(models.Model):
 
 
 class Image(models.Model):
+    """
+    Images of each products. Each products can contain more than one image.
+    """
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name="product_img")
     image = models.ImageField(upload_to='product_image/')
     default = models.BooleanField(default=False)
@@ -124,6 +128,9 @@ class Image(models.Model):
 
 
 class ProductCategory(models.Model):
+    """
+    Category of products. Each product can only have one category.
+    """
     title = models.CharField(max_length=50)
 
     def __str__(self):
@@ -131,6 +138,10 @@ class ProductCategory(models.Model):
 
 
 class ProductTag(models.Model):
+    """
+    Tags of each product. Each product can
+    have none or more than one tag.
+    """
     title = models.CharField(max_length=50)
 
     class Meta : 

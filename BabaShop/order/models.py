@@ -141,7 +141,6 @@ class ProductLike(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     default = models.BooleanField(default=False)
 
-
     class Meta:
         unique_together = ('product', 'customer',)
         
