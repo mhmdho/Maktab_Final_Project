@@ -11,6 +11,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 
 class SupplierLogin(LoginView):
+    """
+    Takes a set of supplier credentials and prove
+    the authentication of those credentials and login.
+    """
     template_name = 'forms/supplier_login.html'
     form_class = SupplierLoginForm
 
@@ -45,6 +49,9 @@ class SupplierLogin(LoginView):
 
 
 class SupplierLogout(LogoutView):
+    """
+    Loguot the authenticated supplier.
+    """
     # next_page = 'supplier_login_url'
     def get(self, request):
         logout(request)
@@ -53,6 +60,9 @@ class SupplierLogout(LogoutView):
 
 
 class SupplierRegister(CreateView):
+    """
+    Takes a set of supplier credentials and register.
+    """
     template_name = 'myuser/supplier_register.html'
     success_url = 'myuser/supplier_login.html'
     form_class = SupplierRegisterForm
