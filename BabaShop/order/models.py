@@ -1,14 +1,18 @@
 from django.db import models, router
-from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import Collector
 from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
 from myuser.models import CustomUser
 
+
 # Create your models here.
 
 
 class Order(models.Model):
+    """
+    Order model of customers, which contains product of just one shop.
+    Each customer can create more than one order but just one in a shop.
+    """
     CH = "CHECKING"
     CF = "CONFIRMED"
     CA = "CANCELED"
@@ -32,19 +36,19 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created_at',]
     
-    def shop_order_total_price(self, slug):
-        self.shop_total_price = 0
-        order_items = self.orderitem_set.filter(product__shop__slug=slug)
-        for item in order_items:
-            self.shop_total_price += item.total_item_price
-        return self.shop_total_price
+    # def shop_order_total_price(self, slug):
+    #     self.shop_total_price = 0
+    #     order_items = self.orderitem_set.filter(product__shop__slug=slug)
+    #     for item in order_items:
+    #         self.shop_total_price += item.total_item_price
+    #     return self.shop_total_price
     
-    def shop_order_total_quantity(self, slug):
-        self.shop_total_quantity = 0
-        order_items = self.orderitem_set.filter(product__shop__slug=slug)
-        for item in order_items:
-            self.shop_total_quantity += item.quantity
-        return self.shop_total_quantity
+    # def shop_order_total_quantity(self, slug):
+    #     self.shop_total_quantity = 0
+    #     order_items = self.orderitem_set.filter(product__shop__slug=slug)
+    #     for item in order_items:
+    #         self.shop_total_quantity += item.quantity
+    #     return self.shop_total_quantity
 
     # def save(self, *args, **kwargs): #move to orderitem
     #     self.total_price = 0
@@ -61,6 +65,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """
+    It filters the unpublished post by the model status
+    """
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)], blank=True)
     discount = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.00)], blank=True, default=0)
@@ -113,6 +120,9 @@ class OrderItem(models.Model):
 
 
 class ProductComment(models.Model):
+    """
+    Comments of each product. Each product can contains more than one comment
+    """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_comment")    
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     subject = models.CharField(max_length=50)
@@ -124,6 +134,9 @@ class ProductComment(models.Model):
 
 
 class ProductLike(models.Model):
+    """
+    Like of each product. Each user can like a post once.
+    """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_like")   
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     default = models.BooleanField(default=False)
