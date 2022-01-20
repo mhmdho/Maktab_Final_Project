@@ -1,4 +1,3 @@
-from typing_extensions import Required
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models.fields import BooleanField, CharField

@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
 from .models import Address, CustomUser
 from django.utils.html import format_html
+
 
 # Register your models here.
 
@@ -15,7 +15,8 @@ class AddressInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     search_fields = ('phone', 'username')
     list_filter = ('is_customer', 'is_supplier')
-    list_display = ('phone', 'email', 'username', 'is_supplier', 'is_customer', 'show_image', 'date_joined')
+    list_display = ('phone', 'email', 'username', 'is_supplier','is_customer',
+                    'show_image', 'date_joined', 'is_phone_verified')
     date_hierarchy = ('date_joined')
 
     @admin.display(empty_value='-',description="show image")
@@ -35,7 +36,8 @@ class CustomUserAdmin(UserAdmin):
     )
     fieldsets = (
         (None, {
-            'fields': (('phone', 'password'), ('username', 'email'), ('is_customer', 'is_supplier'))
+            'fields': (('phone', 'password'), ('username', 'email'),
+                    ('is_customer', 'is_supplier'))
         }),
 
         ('more options', {
@@ -56,7 +58,8 @@ admin.site.register(CustomUser, CustomUserAdmin)
 class AddressAdmin(admin.ModelAdmin):
     search_fields = ('city',)
     list_filter = ('city', 'country')
-    list_display = ('label', 'customer', 'country', 'city', 'zipcode', 'show_image')
+    list_display = ('label', 'customer', 'country',
+                    'city', 'zipcode', 'show_image')
 
     @admin.display(empty_value='-',description="show image")
     def show_image(self, obj):
@@ -69,7 +72,8 @@ class AddressAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('customer', 'label', ('country', 'city'), 'address', 'zipcode')
+            'fields': ('customer', 'label', ('country', 'city'),
+                    'address', 'zipcode')
         }),
 
         ('more options', {
