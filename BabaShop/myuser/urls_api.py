@@ -1,6 +1,6 @@
 from django.urls import path
-from .views_api import CustomerPhoneVerify, CustomerRegister, MyObtainTokenPairView,\
-                    CustomerProfileView, TokenRefreshView2
+from .views_api import CustomerLoginOtp, CustomerPhoneVerify, CustomerRegister,\
+                    MyObtainTokenPairView, CustomerProfileView, TokenRefreshView2
 
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     path('customer_login/refresh/', TokenRefreshView2.as_view(), name='token_refresh'),
     path('customer_profile/', CustomerProfileView.as_view(), name='customer_profile_api'),
     path('customer/phone/verify/', CustomerPhoneVerify.as_view(), name='customer_phone_verify_api'),
+    path('customer_login/<phone>/otp/', CustomerLoginOtp.as_view(), name='supplier_login_otp_api'),
 ]

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from myuser.models import CustomUser
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import CustomerPhoneVerifySerializer, CustomerProfileSerializer, RegisterSerializer
+from .serializers import CustomerLoginOtpSerializer, CustomerPhoneVerifySerializer, CustomerProfileSerializer, RegisterSerializer
 from rest_framework import generics
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
@@ -15,6 +15,7 @@ from django_otp.util import random_hex
 from datetime import datetime
 import time
 from django.core.cache import cache
+from rest_framework.views import APIView
 
 
 # Create your views here.
@@ -83,6 +84,7 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
                          status=status.HTTP_201_CREATED)
         
     def put(self, request, *args, **kwargs):
+        super().put(request, *args, **kwargs)
         customer = get_object_or_404(CustomUser, id=self.request.user.id)
         if customer.is_phone_verified:
             return Response({"Message": "Your phone have been verified before"},
@@ -96,7 +98,28 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
             if otp == entered_otp:
                 customer.is_phone_verified = True
                 customer.save()
-
-        super().put(request, *args, **kwargs)
         return Response({"Verified": customer.is_phone_verified},
                         status=status.HTTP_200_OK)
+
+
+class CustomerLoginOtp(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = CustomerLoginOtpSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        customer = get_object_or_404(CustomUser, phone=self.kwargs['phone'])
+        if customer:
+            if customer.is_phone_verified:
+                OTP=TOTP(key=bytes(self.kwargs['phone']+str(time.time()//300), 'utf-8'), 
+                        step=300, digits=6)
+                expire = OTP.t0 + OTP.step * (OTP.t()+1)
+                expire_at = datetime.fromtimestamp(expire).strftime('%Y-%b-%d %H:%M:%S')
+                cache.set(customer.phone, OTP.token(), timeout=300)
+                return Response({"Verify Code": str(OTP.token()).zfill(6),
+                                "Expire at": expire_at},
+                                    status=status.HTTP_201_CREATED)
+            return Response({"Verified": "Your phone is not verified"},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"Verified": "You have not registered yet"},
+                        status=status.HTTP_404_NOT_FOUND)

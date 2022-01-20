@@ -54,3 +54,9 @@ class CustomerPhoneVerifySerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('otp',)
+
+
+class CustomerLoginOtpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('phone',)
