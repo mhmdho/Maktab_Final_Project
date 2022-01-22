@@ -88,9 +88,7 @@ class PayOrderView(generics.UpdateAPIView):
         except:
             return Response({'Error': 'No order to pay'}, status=status.HTTP_204_NO_CONTENT)
         if order.id == self.kwargs['pk']:
-            print(order.is_payment)
             order.is_payment=True
-            print(order.is_payment)
             order.save()
             return Response({'Success': 'Payment done'}, status=status.HTTP_202_ACCEPTED)
         return Response({'Error': 'Incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)

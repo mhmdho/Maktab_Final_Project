@@ -16,7 +16,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('phone', 'username')
     list_filter = ('is_customer', 'is_supplier')
     list_display = ('phone', 'email', 'username', 'is_supplier','is_customer',
-                    'show_image', 'date_joined', 'is_phone_verified')
+                    'is_phone_verified', 'show_image', 'date_joined')
     date_hierarchy = ('date_joined')
 
     @admin.display(empty_value='-',description="show image")
@@ -50,7 +50,7 @@ class CustomUserAdmin(UserAdmin):
     inlines = [
         AddressInline,
     ]
-    list_editable = ('is_customer', 'is_supplier')
+    list_editable = ('is_customer', 'is_supplier', 'is_phone_verified')
 
 admin.site.register(CustomUser, CustomUserAdmin)
 
