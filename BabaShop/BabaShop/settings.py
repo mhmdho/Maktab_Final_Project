@@ -161,6 +161,7 @@ MESSAGE_TAGS = {
 
 AUTHENTICATION_BACKENDS = [
     'myuser.backends.AuthBackend',
+    'myuser.backends.AuthBackendOTP',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
