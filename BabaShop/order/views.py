@@ -52,8 +52,8 @@ class OrderList(LoginRequiredMixin, DetailView):
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
-            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+            # context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+            # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['orders_value'] = orders_value
           
         filter_order = OrderFilter(self.request.GET, queryset=Order.objects.filter(
@@ -64,11 +64,11 @@ class OrderList(LoginRequiredMixin, DetailView):
             # print(ord['shop_order_total_price'])
             # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['filter'] = filter_order
-        for ord in context['filter'].queryset:
-            print(ord)
-            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            print(context['shop_order_total_price'])
-            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+        # for ord in context['filter'].queryset:
+        #     print(ord)
+        #     context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+        #     print(context['shop_order_total_price'])
+        #     context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         return context
 
 

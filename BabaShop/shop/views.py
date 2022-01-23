@@ -38,8 +38,8 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
-            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+            # context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+            # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['orders_value'] = orders_value
 
         return context
