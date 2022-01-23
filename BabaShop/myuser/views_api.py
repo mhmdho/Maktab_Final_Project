@@ -107,25 +107,26 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-class CustomerLoginOtp(APIView):
+class CustomerLoginOtp(generics.GenericAPIView):
     """
     Generates otp in order to customer login.
+    Customer can also login with phone and otp.
     """
     permission_classes = (AllowAny,)
     serializer_class = CustomerLoginOtpSerializer
     parser_classes = (MultiPartParser, FormParser)
 
-
     @swagger_auto_schema(
-        responses={'201': CustomerLoginOtpSerializer,
+        responses={'201': 'Return otp + expirataion time',
                    '401': 'If user phone not verified',
                    '404': 'If user not registered'}
     )
     def post(self, request, *args, **kwargs):
-        customer = get_object_or_404(CustomUser, phone=self.kwargs['phone'])
+        customer = CustomUser.objects.filter(
+            phone=self.request.data['phone']).first()
         if customer:
             if customer.is_phone_verified:
-                otp = OTP(self.kwargs['phone'])
+                otp = OTP(self.request.data['phone'])
                 return Response({"Verify Code": otp.generate_token(),
                                 "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
@@ -133,3 +134,4 @@ class CustomerLoginOtp(APIView):
                             status=status.HTTP_401_UNAUTHORIZED)
         return Response({"Error": "You have not registered yet"},
                         status=status.HTTP_404_NOT_FOUND)
+                        

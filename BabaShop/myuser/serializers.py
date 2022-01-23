@@ -46,7 +46,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('phone', 'email', 'username', 'image', 'first_name', 'last_name', 'is_phone_verified')
+        fields = ('phone', 'email', 'username', 'image',
+            'first_name', 'last_name', 'is_phone_verified')
 
 
 class CustomerPhoneVerifySerializer(serializers.ModelSerializer):

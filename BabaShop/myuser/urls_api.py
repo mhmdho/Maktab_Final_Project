@@ -4,10 +4,10 @@ from .views_api import CustomerLoginOtp, CustomerPhoneVerify, CustomerRegister,\
 
 
 urlpatterns = [
-    path('customer_register/', CustomerRegister.as_view(), name='customer_register_api'),
-    path('customer_login/', MyObtainTokenPairView.as_view(), name='token_obtain_pair'),
-    path('customer_login/refresh/', TokenRefreshView2.as_view(), name='token_refresh'),
-    path('customer_profile/', CustomerProfileView.as_view(), name='customer_profile_api'),
+    path('customer/register/', CustomerRegister.as_view(), name='customer_register_api'),
+    path('customer/login/', MyObtainTokenPairView.as_view(), name='token_obtain_pair'),
+    path('customer/login/refresh/', TokenRefreshView2.as_view(), name='token_refresh'),
+    path('customer/profile/', CustomerProfileView.as_view(), name='customer_profile_api'),
     path('customer/phone/verify/', CustomerPhoneVerify.as_view(), name='customer_phone_verify_api'),
-    path('customer_login/<phone>/otp/', CustomerLoginOtp.as_view(), name='supplier_login_otp_api'),
+    path('customer/login/otp/', CustomerLoginOtp.as_view(), name='supplier_login_otp_api'),
 ]
