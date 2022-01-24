@@ -9,6 +9,7 @@ from myuser.forms import SupplierPhoneVerifyForm
 from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
+from .utils import OTP
 
 
 # Create your views here.
@@ -105,3 +106,13 @@ class SupplierPhoneVerify(UpdateView):
         #     return redirect('shop_detail_url', slug=slug)
         form = SupplierPhoneVerifyForm()
         return render(request, 'forms/supplier_phone_verify.html',{'form': form})
+
+class SupplierPhoneOtp(View):
+    model = CustomUser
+    
+    def get(self, request, *args, **kwargs):
+        obj = self.model.objects.filter(pk=self.request.user.id).first()
+        phone = obj.phone
+        otp = OTP(phone)
+        messages.success(request, f"OTP: {otp.generate_token()}" )
+        return redirect('supplier_phone_verify_url')

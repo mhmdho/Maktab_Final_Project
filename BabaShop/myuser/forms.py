@@ -1,11 +1,9 @@
-from sys import maxsize
 from django import forms
 from django.forms import TextInput
 from django.forms import Form
 from django.forms.widgets import EmailInput
 from .models import CustomUser
-
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
 
