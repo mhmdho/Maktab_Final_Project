@@ -1,8 +1,11 @@
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login, logout
+from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import TemplateView
+from myuser.models import CustomUser
+from myuser.forms import SupplierPhoneVerifyForm
 from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
@@ -87,6 +90,18 @@ class SupplierRegister(CreateView):
         return redirect('supplier_register_url')
 
 
-class SupplierPhoneVerify(TemplateView):
+class SupplierPhoneVerify(UpdateView):
     template_name = 'forms/supplier_phone_verify.html'
-    
+    form_class = SupplierPhoneVerifyForm
+    model = CustomUser
+
+    # def get_queryset(self):
+    #     return CustomUser.objects.filter(id=self.request.user.id)
+        # return super().get_queryset()
+    def get(self, request):
+        # if request.user.is_authenticated:
+        #     slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
+        #     messages.success(request, "Your are loged in before." )
+        #     return redirect('shop_detail_url', slug=slug)
+        form = SupplierPhoneVerifyForm()
+        return render(request, 'forms/supplier_phone_verify.html',{'form': form})

@@ -1,3 +1,4 @@
+from sys import maxsize
 from django import forms
 from django.forms import TextInput
 from django.forms import Form
@@ -72,4 +73,15 @@ class SupplierLoginForm(Form):
             'class':'form-control', 
             'id': "password-field",
             'autocomplete': 'current-password'}),
+    )
+
+
+class SupplierPhoneVerifyForm(Form):
+    otp = forms.CharField(
+        max_length=6, 
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+            'placeholder': 'Enter the code',
+            'class':'form-control text-center'}),
     )
