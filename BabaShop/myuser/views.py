@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import TemplateView
 from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
@@ -20,7 +21,7 @@ class SupplierLogin(LoginView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            # messages.success(request, "Your are loged in before." )
+            messages.success(request, "Your are logged in before." )
             shop = Shop.Undeleted.filter(supplier=self.request.user).first()
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
@@ -84,3 +85,8 @@ class SupplierRegister(CreateView):
             return redirect('supplier_login_url')
         messages.error(request, "Invalid Input!." )
         return redirect('supplier_register_url')
+
+
+class SupplierPhoneVerify(TemplateView):
+    template_name = 'forms/supplier_phone_verify.html'
+    
