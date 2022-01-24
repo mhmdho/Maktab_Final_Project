@@ -48,14 +48,15 @@
 							{% csrf_token %}
 
 							<div class="input-group mb-3">
-								<button style="border-top-right-radius: 0;
-											border-bottom-right-radius: 0"
-										class="btn btn-outline-warning w-50" type="button">
+								<a href='{% url "supplier_phone_otp_url" %}' 
+									style="border-top-right-radius: 0;
+										border-bottom-right-radius: 0"
+									class="btn btn-outline-warning w-50" type="button">
 								<i class="fa fa-fw fa-envelope mx-2"></i>
 									<span class="mx-2">
 										Send Code
 									</span>
-								</button>
+								</a>
 								{{ form.otp }}
 							</div>
 

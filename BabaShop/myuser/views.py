@@ -10,6 +10,8 @@ from shop.models import Shop
 from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
 from .utils import OTP
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 
 # Create your views here.
@@ -91,21 +93,32 @@ class SupplierRegister(CreateView):
         return redirect('supplier_register_url')
 
 
-class SupplierPhoneVerify(UpdateView):
+class SupplierPhoneVerify(LoginRequiredMixin, UpdateView):
     template_name = 'forms/supplier_phone_verify.html'
+    login_url = '/myuser/supplier_login/'
     form_class = SupplierPhoneVerifyForm
     model = CustomUser
 
-    # def get_queryset(self):
-    #     return CustomUser.objects.filter(id=self.request.user.id)
-        # return super().get_queryset()
+    def get_object(self):
+        return self.model.objects.get(pk=self.request.user.id)
+
     def get(self, request):
-        # if request.user.is_authenticated:
-        #     slug = Shop.Undeleted.filter(supplier=self.request.user).first().slug
-        #     messages.success(request, "Your are loged in before." )
-        #     return redirect('shop_detail_url', slug=slug)
-        form = SupplierPhoneVerifyForm()
-        return render(request, 'forms/supplier_phone_verify.html',{'form': form})
+        if self.get_object().is_phone_verified:
+            messages.info(request, "You have verified your phone before." )
+            return redirect('supplier_login_url')
+        return render(request, self.template_name, {'form': self.form_class})
+    
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        otp = OTP(obj.phone)
+        if otp.verify_token(self.request.POST['otp']):
+            obj.is_phone_verified = True
+            obj.save()
+            messages.success(request, "Phone verified successfully." )
+            return redirect('supplier_login_url')
+        messages.error(request, "Expired or wrong code." )
+        return redirect('supplier_phone_verify_url')
+
 
 class SupplierPhoneOtp(View):
     model = CustomUser
