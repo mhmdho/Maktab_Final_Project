@@ -25,6 +25,9 @@ class AuthBackendOTP(ModelBackend): #  user can login with phone and otp
     def authenticate(self, request, phone=None, password=None, **kwargs):
         try:
             user = UserModel.objects.get(phone__iexact=phone)
+        except UserModel.DoesNotExist:
+            UserModel().set_password(password)
+            return
         except UserModel.MultipleObjectsReturned:
             user = UserModel.objects.filter(phone__iexact=phone).order_by('id').first()
 

@@ -97,23 +97,20 @@ class SupplierPhoneVerify(LoginRequiredMixin, UpdateView):
     template_name = 'forms/supplier_phone_verify.html'
     login_url = '/myuser/supplier_login/'
     form_class = SupplierPhoneVerifyForm
-    model = CustomUser
-
-    def get_object(self):
-        return self.model.objects.get(pk=self.request.user.id)
 
     def get(self, request):
-        if self.get_object().is_phone_verified:
+        supplier = CustomUser.objects.filter(pk=self.request.user.id).first()
+        if supplier.is_phone_verified:
             messages.info(request, "You have verified your phone before." )
             return redirect('supplier_login_url')
         return render(request, self.template_name, {'form': self.form_class})
     
     def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        otp = OTP(obj.phone)
+        supplier = CustomUser.objects.filter(pk=self.request.user.id).first()
+        otp = OTP(supplier.phone)
         if otp.verify_token(self.request.POST['otp']):
-            obj.is_phone_verified = True
-            obj.save()
+            supplier.is_phone_verified = True
+            supplier.save()
             messages.success(request, "Phone verified successfully." )
             return redirect('supplier_login_url')
         messages.error(request, "Expired or wrong code." )
@@ -125,7 +122,6 @@ class SupplierPhoneOtp(View):
     
     def get(self, request, *args, **kwargs):
         obj = self.model.objects.filter(pk=self.request.user.id).first()
-        phone = obj.phone
-        otp = OTP(phone)
+        otp = OTP(obj.phone)
         messages.success(request, f"OTP: {otp.generate_token()}" )
         return redirect('supplier_phone_verify_url')
