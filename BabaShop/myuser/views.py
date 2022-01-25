@@ -122,5 +122,8 @@ class SupplierPhoneOtp(View):
     """
     def get(self, request, *args, **kwargs):
         otp = OTP(self.request.user.phone)
+        show_phone = self.request.user.phone[0:5] + '****' +\
+                    self.request.user.phone[9:]
+        messages.success(request, f"SMS sent to {show_phone}" )
         messages.success(request, f"OTP: {otp.generate_token()}" )
         return redirect('supplier_phone_verify_url')
