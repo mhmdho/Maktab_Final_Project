@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from django.core.cache import cache
 from drf_yasg.utils import swagger_auto_schema
 from .utils import OTP
+from myuser.tasks import smsir_otp
 
 
 # Create your views here.
@@ -127,6 +128,7 @@ class CustomerLoginOtp(generics.GenericAPIView):
         if customer:
             if customer.is_phone_verified:
                 otp = OTP(self.request.data['phone'])
+                smsir_otp.delay('09353666110', otp.generate_token())
                 return Response({"Verify Code": otp.generate_token(),
                                 "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
