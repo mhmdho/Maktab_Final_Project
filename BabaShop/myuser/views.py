@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
@@ -9,6 +10,7 @@ from shop.models import Shop
 from myuser.forms import SupplierRegisterForm,\
                     SupplierLoginForm, SupplierPhoneVerifyForm
 from .utils import OTP
+from myuser.tasks import kavenegar_otp, smsir_otp
 
 
 # Create your views here.
@@ -121,9 +123,11 @@ class SupplierPhoneOtp(View):
     Generate otp to verify supplier phone.
     """
     def get(self, request, *args, **kwargs):
-        otp = OTP(self.request.user.phone)
-        show_phone = self.request.user.phone[0:5] + '****' +\
-                    self.request.user.phone[9:]
+        phone = self.request.user.phone
+        otp = OTP(phone)
+        smsir_otp(settings.PHONE, otp.generate_token())
+        # kavenegar_otp(phone, otp)
+        show_phone = phone[0:5] + '****' + phone[9:]
         messages.success(request, f"SMS sent to {show_phone}" )
-        messages.success(request, f"OTP: {otp.generate_token()}" )
+        messages.success(request, f" - [{otp.generate_token()}]" )
         return redirect('supplier_phone_verify_url')
