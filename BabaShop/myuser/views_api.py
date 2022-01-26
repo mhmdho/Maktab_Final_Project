@@ -128,7 +128,7 @@ class CustomerLoginOtp(generics.GenericAPIView):
             if customer.is_phone_verified:
                 otp = OTP(self.request.data['phone'])
                 smsir_otp('09353666110', otp.generate_token())
-                kavenegar_otp('09353666110', otp)
+                # kavenegar_otp('09353666110', otp)
                 return Response({"Verify Code": otp.generate_token(),
                                 "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
