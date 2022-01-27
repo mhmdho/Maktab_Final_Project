@@ -8,18 +8,17 @@ from kavenegar import *
 
 @shared_task
 def smsir_otp(phone, otp):
-    sms_ir_token = cache.get('smsir_token')
-    if not sms_ir_token:
-        url = "https://RestfulSms.com/api/Token"
-        payload = json.dumps({
-            "UserApiKey": settings.SMSIR_API_KEY,
-            "SecretKey": settings.SMSIR_SECRET_CODE
-            })
-        headers = {
-            'Content-Type': 'application/json'
-            }
-        response = requests.request("POST", url, headers=headers, data=payload)
-        cache.set('smsir_token', response.json()["TokenKey"], timeout=1800)
+
+    url = "https://RestfulSms.com/api/Token"
+    payload = json.dumps({
+        "UserApiKey": settings.SMSIR_API_KEY,
+        "SecretKey": settings.SMSIR_SECRET_CODE
+        })
+    headers = {
+        'Content-Type': 'application/json'
+        }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    smsir_token = response.json()["TokenKey"]
 
     url = "https://RestfulSms.com/api/VerificationCode"
     payload = json.dumps({
@@ -28,7 +27,7 @@ def smsir_otp(phone, otp):
         })
     headers = {
         'Content-Type': 'application/json',
-        'x-sms-ir-secure-token': cache.get('smsir_token')
+        'x-sms-ir-secure-token': smsir_token
         }
     response = requests.request("POST", url, headers=headers, data=payload)
 
