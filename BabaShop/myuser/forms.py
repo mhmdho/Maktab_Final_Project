@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import TextInput
+from django.forms import ModelForm, TextInput
 from django.forms import Form
 from django.forms.widgets import EmailInput
 from .models import CustomUser
@@ -83,3 +83,21 @@ class SupplierPhoneVerifyForm(Form):
             'placeholder': 'Enter the code',
             'class':'form-control text-center'}),
     )
+
+
+class SupplierLoginOtpForm(ModelForm):
+    otp = forms.CharField(
+        max_length=6, 
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+            'placeholder': 'Enter the code',
+            'class':'form-control text-center'}))
+            
+    class Meta:
+        model = CustomUser
+        fields = ("phone", "otp")
+        widgets = {
+            'phone': TextInput(attrs={'class':'form-control text-center',
+                                    'placeholder': "Phone"})
+            }

@@ -8,8 +8,8 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic.edit import CreateView
 from shop.models import Shop
-from myuser.forms import SupplierRegisterForm,\
-                    SupplierLoginForm, SupplierPhoneVerifyForm
+from myuser.forms import SupplierRegisterForm, SupplierLoginForm,\
+                     SupplierPhoneVerifyForm, SupplierLoginOtpForm
 from .utils import OTP
 from myuser.tasks import kavenegar_otp, smsir_otp
 
@@ -132,3 +132,41 @@ class SupplierPhoneOtp(View):
         messages.success(request, f"SMS sent to {show_phone}" )
         messages.success(request, f" - [{otp.generate_token()}]" )
         return redirect('supplier_phone_verify_url')
+
+
+class SupplierLoginOtp(LoginView):
+    """
+    Takes a set of supplier credentials and prove
+    the authentication of those credentials and login by otp.
+    """
+    template_name = 'forms/supplier_forget_password.html'
+    form_class = SupplierLoginOtpForm
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.success(request, "Your are logged in before." )
+            shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+            if shop:
+                return redirect('shop_detail_url', slug=shop.slug)
+            return redirect('create_shop_url')
+        form = SupplierLoginOtpForm()
+        return render(request, 'forms/supplier_forget_password.html', {'form': form})
+    
+    def post(self, request):
+        form = SupplierLoginOtpForm(request.POST)
+        print(form)
+        if form.is_valid():
+            user = authenticate(phone=form.cleaned_data['phone'], otp=form.cleaned_data['otp'])
+            if user is not None:
+                if user.is_supplier and user.is_active:
+                        login(request, user)
+                        shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+                        messages.success(request, "Login successfully." )
+                        if shop:
+                            return redirect('shop_detail_url', slug=shop.slug)
+                        return redirect('create_shop_url')
+                messages.info(request, "You are not a supplier or your acount suspended." )
+                return redirect('supplier_login_url')
+
+        messages.error(request, "Unsuccessful login. Invalid user" )
+        return redirect('supplier_login_url')
