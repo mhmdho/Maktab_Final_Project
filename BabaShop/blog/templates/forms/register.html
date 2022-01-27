@@ -15,7 +15,6 @@
             {% for field in form %}
             <label for="title" class="col-form-label">{{ field.label_tag }}</label>
             <div class="fieldWrapper mb-4">
-                {{ field.errors }}
                 {{ field }}
                 {% if field.help_text %}
                     <p class="help">{{ field.help_text|safe }}</p>
