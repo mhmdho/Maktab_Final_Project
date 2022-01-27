@@ -34,7 +34,7 @@ class TestCreateOrder(APITestCase):
             "quantity": 3
         }
         resp = self.client.post(url, data=data)
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 201) #
 
     def test_create_order_unauthorized(self):
         url = reverse('create_order_api', args=['darian_hyper'])

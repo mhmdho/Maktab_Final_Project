@@ -84,7 +84,7 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
         super().get(request, *args, **kwargs)
         customer = get_object_or_404(CustomUser, id=self.request.user.id)
         if customer.is_phone_verified:
-            return Response({"Message": "Your phone have been verified"},
+            return Response({"Message": "Your phone have been verified before"},
                             status=status.HTTP_200_OK)
         otp = OTP(customer.phone)
         # cache.set(customer.phone, otp.generate_token(), timeout=300)
@@ -105,7 +105,7 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
             customer.is_phone_verified = True
             customer.save()
             return Response({"Verified": customer.is_phone_verified},
-                            status=status.HTTP_200_OK)
+                            status=status.HTTP_202_ACCEPTED)
         return Response({"Error": "Wrong OTP or expired"},
                         status=status.HTTP_400_BAD_REQUEST)
 
