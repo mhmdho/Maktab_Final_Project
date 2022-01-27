@@ -2,7 +2,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from myuser.auth import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic.edit import CreateView
