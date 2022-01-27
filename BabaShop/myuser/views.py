@@ -126,8 +126,8 @@ class SupplierPhoneOtp(View):
     def get(self, request, *args, **kwargs):
         phone = self.request.user.phone
         otp = OTP(phone)
-        smsir_otp(settings.PHONE, otp.generate_token())
-        # kavenegar_otp(phone, otp)
+        smsir_otp.delay(settings.PHONE, otp.generate_token())
+        # kavenegar_otp.delay(phone, otp)
         show_phone = phone[0:5] + '****' + phone[9:]
         messages.success(request, f"SMS sent to {show_phone}" )
         messages.success(request, f" - [{otp.generate_token()}]" )

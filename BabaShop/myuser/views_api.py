@@ -88,8 +88,8 @@ class CustomerPhoneVerify(generics.RetrieveUpdateAPIView):
                             status=status.HTTP_200_OK)
         otp = OTP(customer.phone)
         # cache.set(customer.phone, otp.generate_token(), timeout=300)
-        smsir_otp(settings.PHONE, otp.generate_token())
-        # kavenegar_otp(customer.phone, otp)
+        smsir_otp.delay(settings.PHONE, otp.generate_token())
+        # kavenegar_otp.delay(customer.phone, otp)
         return Response({"Verify Code": otp.generate_token(),
                         "Expire at": otp.expire_at},
                          status=status.HTTP_201_CREATED)
@@ -130,8 +130,8 @@ class CustomerLoginOtp(generics.GenericAPIView):
         if customer:
             if customer.is_phone_verified:
                 otp = OTP(phone)
-                smsir_otp(settings.PHONE, otp.generate_token())
-                # kavenegar_otp(phone, otp)
+                smsir_otp.delay(settings.PHONE, otp.generate_token())
+                # kavenegar_otp.delay(phone, otp)
                 return Response({"Verify Code": otp.generate_token(),
                                 "Expire at": otp.expire_at},
                                     status=status.HTTP_201_CREATED)
