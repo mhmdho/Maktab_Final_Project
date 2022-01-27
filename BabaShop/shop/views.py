@@ -3,7 +3,8 @@ from django.db.models.aggregates import Count
 from django.shortcuts import redirect
 from django.views.generic import DetailView, UpdateView
 from django.views.generic.base import ContextMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from myuser.auth import LoginRequiredMixin, PhoneVerifyRequiredMixin
 from django.urls import reverse
 from django.views.generic.edit import CreateView
 from shop.models import Image, Shop, Product
@@ -14,7 +15,7 @@ from shop.forms import CreateShopForm, CreateProductForm
 # Create your views here.
 
 
-class ShopDetail(LoginRequiredMixin, DetailView):
+class ShopDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'shop/shop_detail.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -45,7 +46,7 @@ class ShopDetail(LoginRequiredMixin, DetailView):
         return context
 
 
-class CreateShop(LoginRequiredMixin, CreateView, ContextMixin):
+class CreateShop(LoginRequiredMixin, PhoneVerifyRequiredMixin, CreateView, ContextMixin):
     template_name = 'forms/create_shop.html'
     login_url = '/myuser/supplier_login/'
     form_class = CreateShopForm
@@ -69,7 +70,7 @@ class CreateShop(LoginRequiredMixin, CreateView, ContextMixin):
             return redirect('shop_detail_url', shop.slug)
     
 
-class EditShop(LoginRequiredMixin,UpdateView):
+class EditShop(LoginRequiredMixin, PhoneVerifyRequiredMixin, UpdateView):
     template_name = 'shop/edit_shop.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -91,7 +92,7 @@ class EditShop(LoginRequiredMixin,UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class EditProduct(LoginRequiredMixin,UpdateView):
+class EditProduct(LoginRequiredMixin, PhoneVerifyRequiredMixin, UpdateView):
     template_name = 'shop/edit_product.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -126,7 +127,7 @@ class EditProduct(LoginRequiredMixin,UpdateView):
         return redirect("create_product_url", self.kwargs["slug"])
 
 
-class DeleteShop(LoginRequiredMixin,UpdateView):
+class DeleteShop(LoginRequiredMixin, PhoneVerifyRequiredMixin, UpdateView):
     login_url = '/myuser/supplier_login/'
     model = Shop
 
@@ -140,7 +141,7 @@ class DeleteShop(LoginRequiredMixin,UpdateView):
         return redirect('create_shop_url')
 
 
-class CreateProduct(LoginRequiredMixin, CreateView, ContextMixin):
+class CreateProduct(LoginRequiredMixin, PhoneVerifyRequiredMixin, CreateView, ContextMixin):
     template_name = 'forms/create_product.html'
     login_url = '/myuser/supplier_login/'
     form_class = CreateProductForm

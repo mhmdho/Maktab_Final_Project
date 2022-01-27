@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count, Max, Sum
 from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from myuser.auth import LoginRequiredMixin, PhoneVerifyRequiredMixin
 from django.views.generic.base import View
 from order.Filters import OrderFilter
 from order.models import OrderItem
@@ -13,7 +14,7 @@ from order.models import Order
 # Create your views here.
 
 
-class OrderList(LoginRequiredMixin, DetailView):
+class OrderList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/order_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -72,7 +73,7 @@ class OrderList(LoginRequiredMixin, DetailView):
         return context
 
 
-class ProductList(LoginRequiredMixin, DetailView):
+class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/product_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -105,7 +106,7 @@ class ProductList(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderDetail(LoginRequiredMixin, DetailView):
+class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/order_detail.html'
     login_url = '/myuser/supplier_login/'
     model = Order
@@ -128,7 +129,7 @@ class OrderDetail(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderEditstatus(LoginRequiredMixin, View):
+class OrderEditstatus(LoginRequiredMixin, PhoneVerifyRequiredMixin, View):
     login_url = '/myuser/supplier_login/'
     model = Order
 
@@ -145,7 +146,7 @@ class OrderEditstatus(LoginRequiredMixin, View):
         return redirect('order_list_url', self.kwargs['slug'])
 
 
-class CustomerList(LoginRequiredMixin, DetailView):
+class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/customer_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -166,7 +167,7 @@ class CustomerList(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderChart(LoginRequiredMixin, DetailView):
+class OrderChart(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/chart.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
