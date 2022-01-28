@@ -85,7 +85,7 @@ class SupplierPhoneVerifyForm(Form):
     )
 
 
-class SupplierLoginOtpForm(ModelForm):
+class SupplierLoginOtpForm(Form):
     otp = forms.CharField(
         max_length=6, 
         min_length=6,
@@ -93,12 +93,9 @@ class SupplierLoginOtpForm(ModelForm):
             attrs={
             'placeholder': 'Enter The Code',
             'class':'form-control'}))
-            
-    class Meta:
-        model = CustomUser
-        fields = ("phone", "otp")
-        widgets = {
-            'phone': TextInput(attrs={'class': 'form-control',
-                                    'id': 'login_phone',
-                                    'placeholder': "Registered Phone"})
-            }
+    
+    phone = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                'id': 'login_phone',
+                'placeholder': "Registered Phone"}))

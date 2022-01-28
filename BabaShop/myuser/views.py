@@ -168,7 +168,7 @@ class SupplierLoginOtp(LoginView):
                             return redirect('shop_detail_url', slug=shop.slug)
                         return redirect('create_shop_url')
                 messages.info(request, "You are not a supplier or your acount suspended." )
-                return redirect('supplier_login_url')
+                return redirect('supplier_login_otp_url')
 
         messages.error(request, "Unsuccessful login. Invalid user" )
-        return redirect('supplier_login_url')
+        return redirect('supplier_login_otp_url')
