@@ -91,13 +91,14 @@ class SupplierLoginOtpForm(ModelForm):
         min_length=6,
         widget=forms.TextInput(
             attrs={
-            'placeholder': 'Enter the code',
-            'class':'form-control text-center'}))
+            'placeholder': 'Enter The Code',
+            'class':'form-control'}))
             
     class Meta:
         model = CustomUser
         fields = ("phone", "otp")
         widgets = {
-            'phone': TextInput(attrs={'class':'form-control text-center',
-                                    'placeholder': "Phone"})
+            'phone': TextInput(attrs={'class': 'form-control',
+                                    'id': 'login_phone',
+                                    'placeholder': "Registered Phone"})
             }

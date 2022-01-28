@@ -124,7 +124,10 @@ class SupplierPhoneOtp(View):
     Generate otp to verify supplier phone.
     """
     def get(self, request, *args, **kwargs):
-        phone = self.request.user.phone
+        if self.request.user.id:
+            phone = self.request.user.phone
+        else:
+            phone = self.request.GET.get('phone')
         otp = OTP(phone)
         smsir_otp.delay(settings.PHONE, otp.generate_token())
         # kavenegar_otp.delay(phone, otp)
@@ -154,9 +157,8 @@ class SupplierLoginOtp(LoginView):
     
     def post(self, request):
         form = SupplierLoginOtpForm(request.POST)
-        print(form)
         if form.is_valid():
-            user = authenticate(phone=form.cleaned_data['phone'], otp=form.cleaned_data['otp'])
+            user = authenticate(phone=form.cleaned_data['phone'], password=form.cleaned_data['otp'])
             if user is not None:
                 if user.is_supplier and user.is_active:
                         login(request, user)
