@@ -1,28 +1,20 @@
 from django.contrib import messages
 from django.db.models.aggregates import Count, Max, Sum
 from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from myuser.auth import LoginRequiredMixin, PhoneVerifyRequiredMixin
 from django.views.generic.base import View
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.response import Response
-from myuser.models import CustomUser
 from order.Filters import OrderFilter
 from order.models import OrderItem
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from shop.models import Shop, Product
 from order.models import Order
-
-
-# API/DRF
-from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderItemCreateSerializer, OrderItemSerializer, OrderSerializer
-from rest_framework import generics, status, viewsets
 
 
 # Create your views here.
 
 
-class OrderList(LoginRequiredMixin, DetailView):
+class OrderList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/order_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -61,8 +53,8 @@ class OrderList(LoginRequiredMixin, DetailView):
         orders_value  = 0
         for ord in context['order_list']:
             orders_value += ord.total_price
-            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+            # context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+            # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['orders_value'] = orders_value
           
         filter_order = OrderFilter(self.request.GET, queryset=Order.objects.filter(
@@ -73,15 +65,15 @@ class OrderList(LoginRequiredMixin, DetailView):
             # print(ord['shop_order_total_price'])
             # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         context['filter'] = filter_order
-        for ord in context['filter'].queryset:
-            print(ord)
-            context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            print(context['shop_order_total_price'])
-            context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+        # for ord in context['filter'].queryset:
+        #     print(ord)
+        #     context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
+        #     print(context['shop_order_total_price'])
+        #     context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
         return context
 
 
-class ProductList(LoginRequiredMixin, DetailView):
+class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/product_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -114,7 +106,7 @@ class ProductList(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderDetail(LoginRequiredMixin, DetailView):
+class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/order_detail.html'
     login_url = '/myuser/supplier_login/'
     model = Order
@@ -137,7 +129,7 @@ class OrderDetail(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderEditstatus(LoginRequiredMixin, View):
+class OrderEditstatus(LoginRequiredMixin, PhoneVerifyRequiredMixin, View):
     login_url = '/myuser/supplier_login/'
     model = Order
 
@@ -154,7 +146,7 @@ class OrderEditstatus(LoginRequiredMixin, View):
         return redirect('order_list_url', self.kwargs['slug'])
 
 
-class CustomerList(LoginRequiredMixin, DetailView):
+class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/customer_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -175,7 +167,7 @@ class CustomerList(LoginRequiredMixin, DetailView):
         return context
 
 
-class OrderChart(LoginRequiredMixin, DetailView):
+class OrderChart(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     template_name = 'order/chart.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -211,111 +203,3 @@ class OrderChart(LoginRequiredMixin, DetailView):
                                                     purchase_quantity=Sum('total_quantity')
                                                     ).order_by('created_at__year')
         return context
-
-
-# ----------------- API / DRF -------------------------
-
-class CreateOrderView(generics.ListCreateAPIView):
-    model = OrderItem
-    permission_classes = (IsAuthenticated,)
-    # parser_classes = (MultiPartParser, FormParser)
-
-    def get_queryset(self, *arg, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = get_object_or_404(Order, shop=shop, customer=self.request.user, is_payment=False)
-        return OrderItem.objects.filter(order=order)
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return OrderItemSerializer
-        elif self.request.method == 'POST':
-            return OrderItemCreateSerializer
-
-    def create(self, request, *args, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        product_id = request.data['product']
-        if product_id:
-            product = get_object_or_404(Product, id=product_id, shop__slug=self.kwargs['slug'])
-            if product.stock > 0:
-                if product.is_active == True:
-                    try:
-                        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-                    except:
-                        order = Order.objects.create(shop=shop, customer=self.request.user)
-                    print('1----------------------------------------------')
-                    request.data['order'] = order.id
-                    print('2----------------------------------------------')
-
-                    serializer = self.get_serializer(data=request.data)
-                    serializer.is_valid(raise_exception=True)
-                    self.perform_create(serializer)
-                    headers = self.get_success_headers(serializer.data)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            return Response({'Error': 'This product is out of order'}, status=status.HTTP_404_NOT_FOUND)
-        return Response({'Error': 'Enter you product'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-class DeleteOrderView(generics.DestroyAPIView):
-    model = OrderItem
-    permission_classes = (IsAuthenticated,)
-    serializer_class = OrderItemSerializer
-
-    def get_queryset(self, *arg, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        return OrderItem.objects.filter(order=order)
-    
-    def delete(self, request, *args, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        orderitem = OrderItem.objects.filter(order=order)
-        self.destroy(request, *args, **kwargs)
-        if orderitem.count() == 0:
-            order.delete()
-            return Response({'Massage': 'Your basket is empty.'}, status=status.HTTP_204_NO_CONTENT)
-        return Response({'Massage': 'Item deleted.'}, status=status.HTTP_204_NO_CONTENT)
-
-
-class PayOrderView(generics.UpdateAPIView):
-    http_method_names = ['put',]
-    model = Order
-    permission_classes = (IsAuthenticated,)
-    serializer_class = OrderSerializer
-
-    def get_queryset(self, *arg, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        return order
-    
-    def put(self, request, *args, **kwargs):
-        shop = get_object_or_404(Shop, slug=self.kwargs['slug'])
-        try:
-            order = Order.objects.get(shop=shop, customer=self.request.user, is_payment=False)
-        except:
-            return Response({'Error': 'No order to pay'}, status=status.HTTP_204_NO_CONTENT)
-        if order.id == self.kwargs['pk']:
-            print(order.is_payment)
-            order.is_payment=True
-            print(order.is_payment)
-            order.save()
-            return Response({'Success': 'Payment done'}, status=status.HTTP_202_ACCEPTED)
-        return Response({'Error': 'Incorrect order id'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UnpaidOrderView(generics.ListAPIView):
-    model = Order
-    permission_classes = (IsAuthenticated,)
-    serializer_class = OrderSerializer
-
-    def get_queryset(self, *arg, **kwargs):
-        return Order.objects.filter(customer=self.request.user, is_payment=False)
-
-
-class PaidOrderView(generics.ListAPIView):
-    model = Order
-    permission_classes = (IsAuthenticated,)
-    serializer_class = OrderSerializer
-
-    def get_queryset(self, *arg, **kwargs):
-        return Order.objects.filter(customer=self.request.user, is_payment=True)

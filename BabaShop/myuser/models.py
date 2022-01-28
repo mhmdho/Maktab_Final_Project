@@ -10,6 +10,10 @@ import random
 
 
 class CustomUser(AbstractUser):
+    """
+    Customize django user and add phone, is_supplier,
+    is_customer, is_phone_verified to it.
+    """
     email = models.EmailField(_('email address'), unique=True)
     
     phone_regex = RegexValidator(regex=r'^09\d{9}$', message="Phone number must be entered in the format: '+989121234567'.")
@@ -41,6 +45,12 @@ class CustomUser(AbstractUser):
         help_text=_('Designates whether the user can log as a supplier.'),
     )
 
+    is_phone_verified = models.BooleanField(
+        _('phone status'),
+        default=False,
+        help_text=_('Designates whether the phone verified.'),
+    )
+
     if phone:
         USERNAME_FIELD = 'phone'
         REQUIRED_FIELDS = [ 'username', 'email']
@@ -58,6 +68,9 @@ class CustomUser(AbstractUser):
 
 
 class Address(models.Model):
+    """
+    The user Address, each user can define more than one address
+    """
     slug = models.SlugField(max_length=70, blank=True, unique=True)
     label = models.CharField(max_length=50)
     country = models.CharField(max_length=50)

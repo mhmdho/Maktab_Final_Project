@@ -1,10 +1,9 @@
 from django import forms
-from django.forms import TextInput
+from django.forms import ModelForm, TextInput
 from django.forms import Form
 from django.forms.widgets import EmailInput
 from .models import CustomUser
-
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
 
@@ -73,3 +72,30 @@ class SupplierLoginForm(Form):
             'id': "password-field",
             'autocomplete': 'current-password'}),
     )
+
+
+class SupplierPhoneVerifyForm(Form):
+    otp = forms.CharField(
+        max_length=6, 
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+            'placeholder': 'Enter the code',
+            'class':'form-control text-center'}),
+    )
+
+
+class SupplierLoginOtpForm(Form):
+    otp = forms.CharField(
+        max_length=6, 
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+            'placeholder': 'Enter The Code',
+            'class':'form-control'}))
+    
+    phone = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                'id': 'login_phone',
+                'placeholder': "Registered Phone"}))

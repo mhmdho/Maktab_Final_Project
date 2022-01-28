@@ -1,33 +1,33 @@
+from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic.edit import CreateView
-from rest_framework.response import Response
-from shop.models import Shop
-from myuser.forms import SupplierRegisterForm, SupplierLoginForm
 from django.contrib.auth.views import LoginView, LogoutView
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from myuser.auth import LoginRequiredMixin
+from django.shortcuts import redirect, render
+from django.views import View
+from django.views.generic.edit import CreateView
+from shop.models import Shop
+from myuser.forms import SupplierRegisterForm, SupplierLoginForm,\
+                     SupplierPhoneVerifyForm, SupplierLoginOtpForm
+from .utils import OTP
+from myuser.tasks import kavenegar_otp, smsir_otp
 
-# API/DRF
-from myuser.models import CustomUser
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import CustomerProfileSerializer, RegisterSerializer
-from rest_framework import generics
-from .serializers import MyTokenObtainPairSerializer
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.parsers import FormParser, MultiPartParser
 
 # Create your views here.
 
 
 class SupplierLogin(LoginView):
+    """
+    Takes a set of supplier credentials and prove
+    the authentication of those credentials and login.
+    """
     template_name = 'forms/supplier_login.html'
     form_class = SupplierLoginForm
 
     def get(self, request):
         if request.user.is_authenticated:
-            # messages.success(request, "Your are loged in before." )
+            messages.success(request, "Your are logged in before." )
             shop = Shop.Undeleted.filter(supplier=self.request.user).first()
             if shop:
                 return redirect('shop_detail_url', slug=shop.slug)
@@ -56,6 +56,9 @@ class SupplierLogin(LoginView):
 
 
 class SupplierLogout(LogoutView):
+    """
+    Loguot the authenticated supplier.
+    """
     # next_page = 'supplier_login_url'
     def get(self, request):
         logout(request)
@@ -64,6 +67,9 @@ class SupplierLogout(LogoutView):
 
 
 class SupplierRegister(CreateView):
+    """
+    Takes a set of supplier credentials and register.
+    """
     template_name = 'myuser/supplier_register.html'
     success_url = 'myuser/supplier_login.html'
     form_class = SupplierRegisterForm
@@ -87,30 +93,82 @@ class SupplierRegister(CreateView):
         return redirect('supplier_register_url')
 
 
-# ----------------- API / DRF -------------------------
+class SupplierPhoneVerify(LoginRequiredMixin, View):
+    """
+    Takes otp and verify supplier phone if
+    the inputed otp be correct.
+    """
+    template_name = 'forms/supplier_phone_verify.html'
+    login_url = '/myuser/supplier_login/'
+    form_class = SupplierPhoneVerifyForm
 
-class MyObtainTokenPairView(TokenObtainPairView):
-    permission_classes = (AllowAny,)
-    serializer_class = MyTokenObtainPairSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
-
-class CustomerRegister(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    permission_classes = (AllowAny,)
-    serializer_class = RegisterSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_phone_verified:
+            messages.info(request, "You have verified your phone before." )
+            return redirect('supplier_login_url')
+        return render(request, self.template_name, {'form': self.form_class})
+    
     def post(self, request, *args, **kwargs):
-        self.create(request, *args, **kwargs)
-        return Response({"Success": "Your registration was successful"}, status=status.HTTP_201_CREATED)
+        otp = OTP(self.request.user.phone)
+        if otp.verify_token(self.request.POST['otp']):
+            self.request.user.is_phone_verified = True
+            self.request.user.save()
+            messages.success(request, "Phone verified successfully." )
+            return redirect('supplier_login_url')
+        messages.error(request, "Expired or wrong code." )
+        return redirect('supplier_phone_verify_url')
 
 
-class CustomerProfileView(generics.RetrieveUpdateAPIView):
-    http_method_names = ['put', 'get']
-    permission_classes = (IsAuthenticated,)
-    serializer_class = CustomerProfileSerializer
-    parser_classes = (MultiPartParser, FormParser)
+class SupplierPhoneOtp(View):
+    """
+    Generate otp to verify supplier phone.
+    """
+    def get(self, request, *args, **kwargs):
+        if self.request.user.id:
+            phone = self.request.user.phone
+        else:
+            phone = self.request.GET.get('phone')
+        otp = OTP(phone)
+        smsir_otp.delay(settings.PHONE, otp.generate_token())
+        # kavenegar_otp.delay(phone, otp)
+        show_phone = phone[0:5] + '****' + phone[9:]
+        messages.success(request, f"SMS sent to {show_phone}" )
+        messages.success(request, f" - [{otp.generate_token()}]" )
+        return redirect('supplier_phone_verify_url')
 
-    def get_object(self):
-        return get_object_or_404(CustomUser, id=self.request.user.id)
+
+class SupplierLoginOtp(LoginView):
+    """
+    Takes a set of supplier credentials and prove
+    the authentication of those credentials and login by otp.
+    """
+    template_name = 'forms/supplier_forget_password.html'
+    form_class = SupplierLoginOtpForm
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.success(request, "Your are logged in before." )
+            shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+            if shop:
+                return redirect('shop_detail_url', slug=shop.slug)
+            return redirect('create_shop_url')
+        form = SupplierLoginOtpForm()
+        return render(request, 'forms/supplier_forget_password.html', {'form': form})
+    
+    def post(self, request):
+        form = SupplierLoginOtpForm(request.POST)
+        if form.is_valid():
+            user = authenticate(phone=form.cleaned_data['phone'], password=form.cleaned_data['otp'])
+            if user is not None:
+                if user.is_supplier and user.is_active:
+                        login(request, user)
+                        shop = Shop.Undeleted.filter(supplier=self.request.user).first()
+                        messages.success(request, "Login successfully." )
+                        if shop:
+                            return redirect('shop_detail_url', slug=shop.slug)
+                        return redirect('create_shop_url')
+                messages.info(request, "You are not a supplier or your acount suspended." )
+                return redirect('supplier_login_otp_url')
+
+        messages.error(request, "Unsuccessful login. Invalid user" )
+        return redirect('supplier_login_otp_url')

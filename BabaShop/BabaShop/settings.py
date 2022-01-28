@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'drf_yasg',
+    'django_otp',
+    # 'django_otp.plugins.otp_totp',
 
     'blog',
     'myuser',
@@ -61,6 +63,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    
+    'django_otp.middleware.OTPMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -156,6 +161,7 @@ MESSAGE_TAGS = {
 
 AUTHENTICATION_BACKENDS = [
     'myuser.backends.AuthBackend',
+    'myuser.backends.AuthBackendOTP',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -181,3 +187,27 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": env("BACKEND"),
+        "LOCATION": env("LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": env("CLIENT_CLASS"),
+        }
+    }
+}
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = [env("CELERY_ACCEPT_CONTENT")]
+CELERY_TASK_SERIALIZER = env("CELERY_TASK_SERIALIZER")
+CELERY_RESULT_SERIALIZER = env("CELERY_RESULT_SERIALIZER")
+
+SMSIR_SECRET_CODE = env("SMSIR_SECRET_CODE")
+SMSIR_API_KEY = env("SMSIR_API_KEY")
+
+KAVENEGAR_API = env("KAVENEGAR_API")
+KAVENEGAR_SENDER = env("KAVENEGAR_SENDER")
+
+PHONE = env("phone")

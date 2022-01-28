@@ -107,7 +107,8 @@ def Register_site(request):
     if request.method == "POST":
         if form.is_valid():
             user = User.objects.create_user(phone=form.cleaned_data['phone'], username=form.cleaned_data['username'],
-                                        email=form.cleaned_data['email'], password=form.cleaned_data['password'])
+                                        email=form.cleaned_data['email'], password=form.cleaned_data['password'],
+                                        is_customer=True)
             return redirect('login_url')
 
     return render(request, 'forms/register.html', {'form':form})

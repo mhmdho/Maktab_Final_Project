@@ -7,16 +7,25 @@ import random
 
 
 class PublishedPost(models.Manager):
+    """
+    It filters the published posts by the model status
+    """
     def get_queryset(self):
         return super(PublishedPost, self).get_queryset().filter(status=True)
 
 
 class UnpublishedPost(models.Manager):
+    """
+    It filters the unpublished posts by the model status
+    """
     def get_queryset(self):
         return super(UnpublishedPost, self).get_queryset().filter(status=False)
 
 
 class Post(models.Model):
+    """
+    Post model of the blog.
+    """
     slug = models.SlugField(max_length=100, blank=True, unique=True)
     title = models.CharField('title post' ,max_length=150)
     supplier = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='post author')
@@ -52,6 +61,9 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    """
+    Comments of each post. Each post can contains more than one comment
+    """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_comment")    
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='comment_owner')
     title = models.CharField(max_length=30)
@@ -64,6 +76,9 @@ class Comment(models.Model):
 
 
 class Category(models.Model):
+    """
+    Category of each post. Each post can contains more than one category.
+    """
     title = models.CharField('title category', max_length=255)
 
     def __str__(self):
@@ -71,6 +86,9 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
+    """
+    Tag of each post. Each post can contains more than one tag
+    """
     title = models.CharField('The_title', max_length=255)
 
     class Meta : 

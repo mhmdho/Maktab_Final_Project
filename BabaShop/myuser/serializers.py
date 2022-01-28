@@ -46,4 +46,18 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('phone', 'email', 'username', 'image', 'first_name', 'last_name')
+        fields = ('phone', 'email', 'username', 'image',
+            'first_name', 'last_name', 'is_phone_verified')
+
+
+class CustomerPhoneVerifySerializer(serializers.ModelSerializer):
+    otp = serializers.CharField(write_only=True, required=True)
+    class Meta:
+        model = CustomUser
+        fields = ('otp',)
+
+
+class CustomerLoginOtpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('phone',)
