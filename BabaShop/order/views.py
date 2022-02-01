@@ -36,6 +36,10 @@ class OrderList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
 
 
 class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of products that are defined.
+    This list belongs to a specific shop of a supplier.
+    """
     template_name = 'order/product_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -47,24 +51,7 @@ class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         context['product_list'] = Product.objects.filter(shop=context['shop'])
-        context['product_count'] = Product.objects.filter(shop=context['shop']).count()
-        context['active_product_count'] = context['product_list'].filter(is_active=True).count()
-        total_product_stock = 0
-        for pro in context['product_list'].filter(is_active=True):
-            total_product_stock += pro.stock
-        context['total_product_stock'] = total_product_stock
-        context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')      
-        context['order_count'] = context['order_list'].count()
-        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
-        context['orderitem_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id'))
-        orders_value  = 0
-        for ord in context['order_list']:
-            orders_value += ord.total_price
-        context['orders_value'] = orders_value
-        filter_order = OrderFilter(self.request.GET, queryset=Order.objects.filter(
-            orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at'))
-        print(filter_order)
-        context['filter'] = filter_order
+
         return context
 
 
