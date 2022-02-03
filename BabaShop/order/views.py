@@ -56,6 +56,10 @@ class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
 
 
 class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of items of an order and details of that order.
+    This list belongs to an order in a specific shop.
+    """
     template_name = 'order/order_detail.html'
     login_url = '/myuser/supplier_login/'
     model = Order
@@ -66,15 +70,9 @@ class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-        context['order_list'] = Order.objects.filter(id=self.kwargs['id'], orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
-        context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'], product__shop__slug=self.kwargs['slug'])
-        shop_total_price = 0
-        shop_total_quantity = 0
-        for item in context['orderitem_list']:
-            shop_total_price += item.total_item_price
-            shop_total_quantity += item.quantity
-        context['shop_total_price'] = shop_total_price
-        context['shop_total_quantity'] = shop_total_quantity
+        context['order_list'] = Order.objects.filter(id=self.kwargs['id'])
+        context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'])
+
         return context
 
 
