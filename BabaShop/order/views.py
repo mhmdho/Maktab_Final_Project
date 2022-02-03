@@ -70,8 +70,8 @@ class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-        context['order_list'] = Order.objects.filter(id=self.kwargs['id'])
-        context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'])
+        context['order_list'] = Order.objects.filter(id=self.kwargs['id'], orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
+        context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'], product__shop__slug=self.kwargs['slug'])
 
         return context
 
