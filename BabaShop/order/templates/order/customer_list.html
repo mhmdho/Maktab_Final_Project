@@ -29,22 +29,22 @@
 
                         {% for order in customer_order %}
                         <tr>
-                            <td class="text-center text-muted">#{{ order.customer.id }}</td>
+                            <td class="text-center text-muted">#{{ order.customer }}</td>
                             <td>
                                 <div class="widget-content p-0">
                                     <div class="widget-content-wrapper">
                                         <div class="widget-content-left mr-3">
                                             <div class="widget-content-left">
                                                 <img width="40" height="40" class="rounded-circle"
-                                                    src="/media/{{ order.customer.image }}" alt="">
+                                                    src="/media/{{ order.customer__image }}" alt="">
                                             </div>
                                         </div>
                                         <div class="widget-content-left flex2">
                                             <div class="widget-heading">
-                                                {{ order.customer.username }}
+                                                {{ order.customer__username }}
                                             </div>
                                             <div class="widget-subheading opacity-7">
-                                                {{ order.customer.phone }}
+                                                {{ order.customer__phone }}
                                             </div>
                                         </div>
                                     </div>
