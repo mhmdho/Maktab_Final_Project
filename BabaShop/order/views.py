@@ -72,7 +72,7 @@ class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         context['order_list'] = Order.objects.filter(id=self.kwargs['id'], orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
         context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'], product__shop__slug=self.kwargs['slug'])
-
+        # check admin order total price bug when change it manualy
         return context
 
 
@@ -94,6 +94,10 @@ class OrderEditstatus(LoginRequiredMixin, PhoneVerifyRequiredMixin, View):
 
 
 class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of customers that ordered in a shop.
+    This customers list belongs to a specific shop.
+    """
     template_name = 'order/customer_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -104,13 +108,13 @@ class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-        context['customer_order'] = Order.objects.filter(shop=context['shop']
-                ).values('customer', 'customer__phone', 'customer__image', 'customer__username').annotate(
-                                                                        last_order=Max('updated_at'),
-                                                                        order_count=Count('id'),
-                                                                        purchase_price=Sum('total_price'),
-                                                                        purchase_quantity=Sum('total_quantity')
-                                                                        ).order_by()
+        context['customer_order'] = Order.objects.filter(
+            shop=context['shop']).annotate(
+                last_order=Max('updated_at'),
+                order_count=Count('id'),
+                purchase_price=Sum('total_price'),
+                purchase_quantity=Sum('total_quantity')
+                    ).order_by()
         return context
 
 
