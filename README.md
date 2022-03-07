@@ -65,10 +65,10 @@ It is possible to search in blog base on name of post and their content
 ### Some pages of Babashop website
 
 #### Register:
-![plot](./images/register.png)
+![register](https://user-images.githubusercontent.com/90003763/157060447-43cee7f4-fbd6-4040-b686-1a17159c1d83.png)
 
 #### Login:
-![plot](./images/login.png)
+![login](https://user-images.githubusercontent.com/90003763/157060111-f6d42a30-e4ed-4a2d-ba74-5f598cca21fb.png)
 
 #### Supplier Dashboard:
 ![plot](./images/dashboard.png)
