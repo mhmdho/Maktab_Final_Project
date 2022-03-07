@@ -35,7 +35,7 @@ This web application contains:
     * Delete / edit shop
     * Delete / edit product
     * Delete / edit post
-* Supplier permissions:
+* Customer permissions:
     * login/ logout/ register/ ...
     * put an order
     * delete from cart
@@ -71,7 +71,10 @@ It is possible to search in blog base on name of post and their content
 ![plot](./images/login.png)
 
 #### Supplier Dashboard:
-![plot](./images/login.png)
+![plot](./images/dashboard.png)
 
 #### Swagger Api:
-![plot](./images/login.png)
+![swagger](https://user-images.githubusercontent.com/90003763/157058762-dc1f3ce6-6b18-4f15-a8a4-751ccbe31ddb.png)
+
+#### Blog:
+![blog](https://user-images.githubusercontent.com/90003763/157055213-d1e18597-a37e-4fc0-b8b8-9dc214b982a3.png)
