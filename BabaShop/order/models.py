@@ -1,5 +1,4 @@
-from django.db import models, router
-from django.db.models.deletion import Collector
+from django.db import models
 from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
 from myuser.models import CustomUser
@@ -35,30 +34,16 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['-created_at',]
-    
-    # def shop_order_total_price(self, slug):
-    #     self.shop_total_price = 0
-    #     order_items = self.orderitem_set.filter(product__shop__slug=slug)
-    #     for item in order_items:
-    #         self.shop_total_price += item.total_item_price
-    #     return self.shop_total_price
-    
-    # def shop_order_total_quantity(self, slug):
-    #     self.shop_total_quantity = 0
-    #     order_items = self.orderitem_set.filter(product__shop__slug=slug)
-    #     for item in order_items:
-    #         self.shop_total_quantity += item.quantity
-    #     return self.shop_total_quantity
 
-    # def save(self, *args, **kwargs): #move to orderitem
-    #     self.total_price = 0
-    #     self.total_quantity = 0
-    #     order_items = self.orderitem_set.all()
-    #     for item in order_items:
-    #         self.total_price += item.total_item_price
-    #         self.total_quantity += item.quantity
-    #     self.total_price = self.total_price * (1-self.discount)
-    #     return super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.total_price = 0
+        self.total_quantity = 0
+        order_items = self.orderitem_set.all()
+        for item in order_items:
+            self.total_price += item.total_item_price
+            self.total_quantity += item.quantity
+        self.total_price = self.total_price * (1-self.discount)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f'order #{self.id} by {self.customer.phone}'
@@ -88,20 +73,14 @@ class OrderItem(models.Model):
             self.unit_price = self.product.price
         self.total_item_price = self.product.price * self.quantity * (1-self.discount)
         
-        self.order.total_price += self.total_item_price
-        self.order.total_quantity += self.quantity
-        self.order.save()
-        
         if self.product.stock >= self.quantity:
             self.product.stock -= self.quantity  # move to reduce at final when payment done
             self.product.save()
-            return super().save(*args, **kwargs)
-
+        
+            super().save(*args, **kwargs)  # check shop of order and orderitem to be the same
+            return self.order.save()
 
     def delete(self, using=None, keep_parents=False):
-        self.order.total_price -= self.total_item_price
-        self.order.total_quantity -= self.quantity
-        self.order.save()
 
         if self.product.stock == 0:
             if self.product.is_active == False:
@@ -109,14 +88,8 @@ class OrderItem(models.Model):
         self.product.stock += self.quantity
         self.product.save()
 
-        using = using or router.db_for_write(self.__class__, instance=self)
-        assert self.pk is not None, (
-            "%s object can't be deleted because its %s attribute is set to None." %
-            (self._meta.object_name, self._meta.pk.attname)
-        )
-        collector = Collector(using=using)
-        collector.collect([self], keep_parents=keep_parents)
-        return collector.delete()
+        super().delete(using, keep_parents)
+        return self.order.save()
 
 
 class ProductComment(models.Model):

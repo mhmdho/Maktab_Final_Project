@@ -15,6 +15,10 @@ from order.models import Order
 
 
 class OrderList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of orders that are put by customers.
+    This list belongs to a specific shop of a supplier.
+    """
     template_name = 'order/order_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -24,56 +28,18 @@ class OrderList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
-        context['product_list'] = Product.objects.filter(shop=context['shop'])
-        context['product_count'] = Product.objects.filter(shop=context['shop']).count()
-        context['active_product_count'] = context['product_list'].filter(is_active=True).count()
-        total_product_stock = 0
-        for pro in context['product_list'].filter(is_active=True):
-            total_product_stock += pro.stock
-        context['total_product_stock'] = total_product_stock
-        context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
-        context['order_count'] = context['order_list'].count()
-        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
-        context['orderitem_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id'))
-        
-        # for order in context['order_list']:
-        #     items = order.orderitem_set.all()
-        #     for item in items:
-        #         shop_total_price = 0
-        #         shop_total_quantity = 0
-        #         shop_total_price += item.total_item_price
-        #         shop_total_quantity += item.quantity
-        # context['shop_total_price'] = shop_total_price
-        # context['shop_total_quantity'] = shop_total_quantity
-        # for order in context['order_list']:
-        #     context['shop_order_total_quantity'] = order.shop_order_total_quantity(self.kwargs['slug'])
-        #     context['shop_order_total_price'] = order.shop_order_total_price(self.kwargs['slug'])
-        
-        orders_value  = 0
-        for ord in context['order_list']:
-            orders_value += ord.total_price
-            # context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
-        context['orders_value'] = orders_value
-          
-        filter_order = OrderFilter(self.request.GET, queryset=Order.objects.filter(
+        context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')          
+        context['filter'] = OrderFilter(self.request.GET, queryset=Order.objects.filter(
             orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at'))
-        # for ord in filter_order.queryset:
-            # print(ord)
-            # context['total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-            # print(ord['shop_order_total_price'])
-            # context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
-        context['filter'] = filter_order
-        # for ord in context['filter'].queryset:
-        #     print(ord)
-        #     context['shop_order_total_price'] = ord.shop_order_total_price(self.kwargs['slug'])
-        #     print(context['shop_order_total_price'])
-        #     context['shop_order_total_quantity'] = ord.shop_order_total_quantity(self.kwargs['slug'])
+
         return context
 
 
 class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of products that are defined.
+    This list belongs to a specific shop of a supplier.
+    """
     template_name = 'order/product_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -85,28 +51,15 @@ class ProductList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         context['product_list'] = Product.objects.filter(shop=context['shop'])
-        context['product_count'] = Product.objects.filter(shop=context['shop']).count()
-        context['active_product_count'] = context['product_list'].filter(is_active=True).count()
-        total_product_stock = 0
-        for pro in context['product_list'].filter(is_active=True):
-            total_product_stock += pro.stock
-        context['total_product_stock'] = total_product_stock
-        context['order_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')      
-        context['order_count'] = context['order_list'].count()
-        context['customer_count'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id')).count()
-        context['orderitem_list'] = Order.objects.filter(orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('customer_id'))
-        orders_value  = 0
-        for ord in context['order_list']:
-            orders_value += ord.total_price
-        context['orders_value'] = orders_value
-        filter_order = OrderFilter(self.request.GET, queryset=Order.objects.filter(
-            orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at'))
-        print(filter_order)
-        context['filter'] = filter_order
+
         return context
 
 
 class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of items of an order and details of that order.
+    This list belongs to an order in a specific shop.
+    """
     template_name = 'order/order_detail.html'
     login_url = '/myuser/supplier_login/'
     model = Order
@@ -119,13 +72,7 @@ class OrderDetail(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         context['order_list'] = Order.objects.filter(id=self.kwargs['id'], orderitem__product__shop__slug=self.kwargs['slug']).annotate(Count('id')).order_by('-created_at')
         context['orderitem_list'] = OrderItem.objects.filter(order_id=self.kwargs['id'], product__shop__slug=self.kwargs['slug'])
-        shop_total_price = 0
-        shop_total_quantity = 0
-        for item in context['orderitem_list']:
-            shop_total_price += item.total_item_price
-            shop_total_quantity += item.quantity
-        context['shop_total_price'] = shop_total_price
-        context['shop_total_quantity'] = shop_total_quantity
+        # check admin order total price bug when change it manualy
         return context
 
 
@@ -147,6 +94,10 @@ class OrderEditstatus(LoginRequiredMixin, PhoneVerifyRequiredMixin, View):
 
 
 class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
+    """
+    Render list of customers and their orders data.
+    This customers list belongs to a specific shop.
+    """
     template_name = 'order/customer_list.html'
     login_url = '/myuser/supplier_login/'
     model = Shop
@@ -159,7 +110,7 @@ class CustomerList(LoginRequiredMixin, PhoneVerifyRequiredMixin, DetailView):
         context['shop_list'] = Shop.Undeleted.filter(supplier=self.request.user).order_by('id')
         context['customer_order'] = Order.objects.filter(shop=context['shop']
                 ).values('customer', 'customer__phone', 'customer__image', 'customer__username').annotate(
-                                                                        last_order=Max('updated_at'),
+                                                                        last_order=Max('created_at'),
                                                                         order_count=Count('id'),
                                                                         purchase_price=Sum('total_price'),
                                                                         purchase_quantity=Sum('total_quantity')
