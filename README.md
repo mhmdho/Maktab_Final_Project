@@ -62,19 +62,26 @@ It is possible to search in blog base on name of post and their content
  * Celery
  * OTP
 
-### Some pages of Babashop website
 
-#### Register:
+## Some pages of Babashop website
+
+### Register:
 ![register](https://user-images.githubusercontent.com/90003763/157060447-43cee7f4-fbd6-4040-b686-1a17159c1d83.png)
 
-#### Login:
+### Login:
 ![login](https://user-images.githubusercontent.com/90003763/157060111-f6d42a30-e4ed-4a2d-ba74-5f598cca21fb.png)
 
-#### Supplier Dashboard:
-![plot](./images/dashboard.png)
+### Login by OTP:
+![otp](https://user-images.githubusercontent.com/90003763/157062021-5612218d-8eae-436a-a092-c7df8ffc14de.png)
 
-#### Swagger Api:
+### Supplier Dashboard:
+![dashboard1](https://user-images.githubusercontent.com/90003763/157065139-d75505ee-272b-48c8-ae5e-e35a2b38cbc7.png)
+![dashboard2](https://user-images.githubusercontent.com/90003763/157067149-06683844-ecf9-4b50-b2f5-408e1a6063ec.png)
+![chart1](https://user-images.githubusercontent.com/90003763/157067143-af179ede-dc1f-4970-bb0d-76d726596d5a.png)
+![chart2](https://user-images.githubusercontent.com/90003763/157069332-19d81ffe-bb12-4204-b25f-030288f0b613.png)
+
+### Swagger Api:
 ![swagger](https://user-images.githubusercontent.com/90003763/157058762-dc1f3ce6-6b18-4f15-a8a4-751ccbe31ddb.png)
 
-#### Blog:
+### Blog:
 ![blog](https://user-images.githubusercontent.com/90003763/157055213-d1e18597-a37e-4fc0-b8b8-9dc214b982a3.png)
