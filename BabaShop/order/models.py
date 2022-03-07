@@ -1,5 +1,4 @@
-from django.db import models, router
-from django.db.models.deletion import Collector
+from django.db import models
 from shop.models import Shop, Product
 from django.core.validators import MinValueValidator
 from myuser.models import CustomUser
