@@ -3,7 +3,7 @@ This project is about an online shop which supplier can register and sell their 
 Customers can buy from each shop and the supplier can check the customer order in his dashboard.
 
 ## Features
-This web application contains:
+This website contains:
 * register with email / phone / username
 * Supplier login / logout 
 * Customer login / logout
@@ -48,7 +48,7 @@ The shop Contain 3 sections:
 * Shop section that mostly related to supplier
 * Order section that mostly related to customer
 * Blog section that only supplier can post and customer just can read and leave a comment
-It is possible to search in blog base on name of post and their content
+It is possible to search in blog base on name of a post and its content
 
 ## Technologies
  * Python
