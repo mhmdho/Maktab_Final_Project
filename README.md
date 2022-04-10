@@ -2,6 +2,10 @@
 This project is about an online shop which supplier can register and sell their products. Each supplier can set more than one shop with defferent type of products. Supplier can also post articles about their product in blog of the BabaShop website.
 Customers can buy from each shop and the supplier can check the customer order in his dashboard.
 
+## ERD
+In the begining I designed ERD of BabaShop project:
+![plot](./ERD.png)
+
 ## Features
 This website contains:
 * register with email / phone / username
